@@ -1,6 +1,7 @@
 /**
- * PIXORA — Global Configuration & Admin State Manager
+ * PIXORA — Global Real-time Configuration & Admin State Manager
  * Synchronizes website maintenance mode, broadcast announcements, and vision thresholds
+ * Real-time Multi-Instance synchronization via Firebase Firestore & BroadcastChannel
  * Developed by AB Designing | Designed by Adharsh
  */
 
@@ -21,7 +22,13 @@ const DEFAULT_CONFIG = {
   designerCredit: "Designed by Adharsh"
 };
 
+const BROADCAST_CHANNEL_NAME = "pixora_global_realtime_v1";
+
 class PixoraConfig {
+  static broadcastChannel = null;
+  static firestoreDb = null;
+  static isSyncingRemote = false;
+
   static get() {
     try {
       const stored = localStorage.getItem("pixora_config");
@@ -40,18 +47,32 @@ class PixoraConfig {
     return DEFAULT_CONFIG;
   }
 
-  static save(updatedConfig) {
+  static async save(updatedConfig) {
     try {
       const current = this.get();
       const merged = {
         ...current,
         ...updatedConfig,
         announcement: { ...current.announcement, ...(updatedConfig.announcement || {}) },
-        maintenance: { ...current.maintenance, ...(updatedConfig.maintenance || {}) }
+        maintenance: { ...current.maintenance, ...(updatedConfig.maintenance || {}) },
+        lastUpdated: Date.now()
       };
+
+      // 1. Local caching
       localStorage.setItem("pixora_config", JSON.stringify(merged));
       window.dispatchEvent(new Event("pixora_config_changed"));
       this.renderGlobalBanners();
+
+      // 2. Broadcast to all open tabs/instances instantly via BroadcastChannel
+      if (this.broadcastChannel) {
+        try {
+          this.broadcastChannel.postMessage({ type: "CONFIG_UPDATED", config: merged });
+        } catch (_) {}
+      }
+
+      // 3. Global Remote Sync via Firebase Firestore
+      this.syncToFirestore(merged);
+
       return true;
     } catch (e) {
       console.error("[PIXORA Config] Error saving config", e);
@@ -63,7 +84,71 @@ class PixoraConfig {
     localStorage.removeItem("pixora_config");
     window.dispatchEvent(new Event("pixora_config_changed"));
     this.renderGlobalBanners();
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: "CONFIG_RESET" });
+      } catch (_) {}
+    }
+    this.syncToFirestore(DEFAULT_CONFIG);
     return DEFAULT_CONFIG;
+  }
+
+  static async syncToFirestore(configData) {
+    try {
+      if (!this.firestoreDb) {
+        await this.initFirebaseFirestore();
+      }
+      if (this.firestoreDb && window.PixoraFirestoreModules) {
+        const { doc, setDoc } = window.PixoraFirestoreModules;
+        await setDoc(doc(this.firestoreDb, "pixora_system", "global_config"), configData, { merge: true });
+        console.log("[PIXORA Realtime] Global configuration synced to Firebase Firestore.");
+      }
+    } catch (err) {
+      // Gracefully silent if network offline or Firestore permissions still pending
+      console.info("[PIXORA Realtime] Firestore cloud sync notice:", err.message);
+    }
+  }
+
+  static async initFirebaseFirestore() {
+    if (this.firestoreDb) return;
+    try {
+      const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const { getFirestore, doc, onSnapshot, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+      window.PixoraFirestoreModules = { doc, setDoc };
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
+        authDomain: "pixora-7dc8f.firebaseapp.com",
+        projectId: "pixora-7dc8f",
+        storageBucket: "pixora-7dc8f.firebasestorage.app",
+        messagingSenderId: "221600400260",
+        appId: "1:221600400260:web:98450bf56be66b46c613d1",
+        measurementId: "G-7B2V7VDSWP"
+      };
+
+      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+      this.firestoreDb = getFirestore(app);
+
+      // Listen to real-time changes across the entire world!
+      onSnapshot(doc(this.firestoreDb, "pixora_system", "global_config"), (snapshot) => {
+        if (snapshot.exists()) {
+          const remoteData = snapshot.data();
+          const current = this.get();
+          // Avoid loop if already identical
+          if (JSON.stringify(remoteData) !== JSON.stringify(current)) {
+            console.log("[PIXORA Realtime] Incoming live config update from Firebase Firestore!");
+            localStorage.setItem("pixora_config", JSON.stringify(remoteData));
+            window.dispatchEvent(new Event("pixora_config_changed"));
+            PixoraConfig.renderGlobalBanners();
+          }
+        }
+      }, (err) => {
+        console.info("[PIXORA Realtime] Firestore live listener:", err.message);
+      });
+    } catch (e) {
+      console.info("[PIXORA Realtime] Local sync active (Firestore cloud fallback):", e.message);
+    }
   }
 
   static renderGlobalBanners() {
@@ -75,15 +160,19 @@ class PixoraConfig {
       bannerContainer = document.createElement("div");
       bannerContainer.id = "pixoraGlobalNoticeBar";
       bannerContainer.className = "w-full z-50 transition-all duration-300";
-      document.body.prepend(bannerContainer);
+      if (document.body) {
+        document.body.prepend(bannerContainer);
+      }
     }
+
+    if (!bannerContainer) return;
 
     let html = "";
 
     // 1. Maintenance Mode Banner (Highest Priority)
     if (config.maintenance && config.maintenance.active) {
       html += `
-        <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg border-b border-amber-400/30 flex items-center justify-between text-xs sm:text-sm font-semibold">
+        <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg border-b border-amber-400/30 flex items-center justify-between text-xs sm:text-sm font-semibold animate-fade-in">
           <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
               <span class="flex h-3 w-3 relative">
@@ -119,7 +208,7 @@ class PixoraConfig {
       }
 
       html += `
-        <div id="pixoraBroadcastItem" class="bg-gradient-to-r ${bgClasses} text-white px-4 py-2.5 shadow-md border-b flex items-center justify-between text-xs font-medium">
+        <div id="pixoraBroadcastItem" class="bg-gradient-to-r ${bgClasses} text-white px-4 py-2.5 shadow-md border-b flex items-center justify-between text-xs font-medium animate-fade-in">
           <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
               <span class="w-2 h-2 rounded-full ${dotClass} animate-pulse"></span>
@@ -137,19 +226,49 @@ class PixoraConfig {
   }
 }
 
-// Auto-initialize when DOM ready and listen for storage changes
-if (typeof document !== "undefined") {
-  document.addEventListener("DOMContentLoaded", () => {
-    PixoraConfig.renderGlobalBanners();
-  });
+// Setup real-time listeners across tabs, windows, and cloud
+if (typeof window !== "undefined") {
+  // 1. BroadcastChannel API for multi-tab instantaneous sync
+  try {
+    if ("BroadcastChannel" in window) {
+      PixoraConfig.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      PixoraConfig.broadcastChannel.onmessage = (event) => {
+        if (event.data && event.data.type === "CONFIG_UPDATED") {
+          localStorage.setItem("pixora_config", JSON.stringify(event.data.config));
+          window.dispatchEvent(new Event("pixora_config_changed"));
+          PixoraConfig.renderGlobalBanners();
+        } else if (event.data && event.data.type === "CONFIG_RESET") {
+          localStorage.removeItem("pixora_config");
+          window.dispatchEvent(new Event("pixora_config_changed"));
+          PixoraConfig.renderGlobalBanners();
+        }
+      };
+    }
+  } catch (_) {}
+
+  // 2. Storage event listener (fallback for browsers without BroadcastChannel)
   window.addEventListener("storage", (e) => {
     if (e.key === "pixora_config") {
       PixoraConfig.renderGlobalBanners();
     }
   });
+
+  // 3. Custom internal event
   window.addEventListener("pixora_config_changed", () => {
     PixoraConfig.renderGlobalBanners();
   });
+
+  // 4. Initial DOM mount and Firestore Cloud sync listener
+  const onReady = () => {
+    PixoraConfig.renderGlobalBanners();
+    PixoraConfig.initFirebaseFirestore();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onReady);
+  } else {
+    onReady();
+  }
 }
 
 window.PixoraConfig = PixoraConfig;

@@ -548,21 +548,27 @@
         }
       }
 
-      function showSavedToast() {
+      function showSavedToast(customMsg) {
+        if (customMsg) {
+          saveStatus.querySelector("span:last-child").innerText = customMsg;
+        } else {
+          saveStatus.querySelector("span:last-child").innerText = "Broadcasted Live to All Visitors & Instances!";
+        }
         saveStatus.classList.remove("hidden");
         setTimeout(() => saveStatus.classList.add("hidden"), 3500);
       }
 
       // Save Maintenance
-      btnSaveMaintenance.addEventListener("click", () => {
-        PixoraConfig.save({
+      btnSaveMaintenance.addEventListener("click", async () => {
+        showSavedToast("Broadcasting Maintenance to All Users...");
+        await PixoraConfig.save({
           maintenance: {
             active: chkMaintenance.checked,
             message: txtMaintenance.value.trim()
           }
         });
         updateBadge(maintenanceBadge, chkMaintenance.checked, "Active", "Disabled", "bg-amber-500/20 text-amber-300 border-amber-500/40");
-        showSavedToast();
+        showSavedToast("Maintenance Mode Updated Across All Connected Users!");
       });
 
       chkMaintenance.addEventListener("change", () => {
@@ -570,9 +576,10 @@
       });
 
       // Save Announcement
-      btnSaveAnn.addEventListener("click", () => {
+      btnSaveAnn.addEventListener("click", async () => {
         const selectedType = document.querySelector('input[name="announcementType"]:checked')?.value || "info";
-        PixoraConfig.save({
+        showSavedToast("Broadcasting Announcement Worldwide...");
+        await PixoraConfig.save({
           announcement: {
             active: chkAnnouncement.checked,
             text: txtAnnouncement.value.trim(),
@@ -580,7 +587,7 @@
           }
         });
         updateBadge(announcementBadge, chkAnnouncement.checked, "Live", "Disabled", "bg-indigo-500/20 text-indigo-300 border-indigo-500/40");
-        showSavedToast();
+        showSavedToast("Live Announcement Broadcasted Across Entire Website!");
       });
 
       chkAnnouncement.addEventListener("change", () => {
@@ -588,14 +595,14 @@
       });
 
       // Save Algorithm Calibration
-      document.getElementById("btnSaveAlgorithm").addEventListener("click", () => {
-        PixoraConfig.save({
+      document.getElementById("btnSaveAlgorithm").addEventListener("click", async () => {
+        await PixoraConfig.save({
           earBlinkThreshold: parseFloat(inEarBlink.value),
           earHalfClosedThreshold: parseFloat(inEarHalf.value),
           blurThreshold: parseInt(inBlur.value, 10),
           duplicateDistance: parseInt(inDup.value, 10)
         });
-        showSavedToast();
+        showSavedToast("Vision Calibration Synced to All Active Studios!");
       });
 
       // Reset Defaults
