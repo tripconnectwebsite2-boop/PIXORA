@@ -1,8 +1,12 @@
 /**
  * PIXORA — Global Real-time Configuration & Admin State Manager
  * Synchronizes website maintenance mode, broadcast announcements, and vision thresholds
- * Real-time Multi-Instance synchronization via Firebase Firestore & BroadcastChannel
+ * Real-time Multi-Instance synchronization via Firebase Realtime Database (RTDB) & BroadcastChannel
  * Developed by AB Designing | Designed by Adharsh
+ * 
+ * STRICT PRIVACY GUARANTEE:
+ * Customer photos are processed 100% locally in browser memory.
+ * No customer photo, face embedding, or user file is ever uploaded or stored in any database.
  */
 
 const DEFAULT_CONFIG = {
@@ -24,10 +28,22 @@ const DEFAULT_CONFIG = {
 
 const BROADCAST_CHANNEL_NAME = "pixora_global_realtime_v1";
 
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
+  authDomain: "pixora-7dc8f.firebaseapp.com",
+  databaseURL: "https://pixora-7dc8f-default-rtdb.firebaseio.com",
+  projectId: "pixora-7dc8f",
+  storageBucket: "pixora-7dc8f.firebasestorage.app",
+  messagingSenderId: "221600400260",
+  appId: "1:221600400260:web:98450bf56be66b46c613d1",
+  measurementId: "G-7B2V7VDSWP"
+};
+
 class PixoraConfig {
   static broadcastChannel = null;
-  static firestoreDb = null;
-  static isSyncingRemote = false;
+  static rtdb = null;
+  static rtdbRef = null;
+  static rtdbSet = null;
 
   static get() {
     try {
@@ -58,20 +74,20 @@ class PixoraConfig {
         lastUpdated: Date.now()
       };
 
-      // 1. Local caching
+      // 1. Immediate local cache and banner update
       localStorage.setItem("pixora_config", JSON.stringify(merged));
       window.dispatchEvent(new Event("pixora_config_changed"));
       this.renderGlobalBanners();
 
-      // 2. Broadcast to all open tabs/instances instantly via BroadcastChannel
+      // 2. Broadcast immediately across open tabs via BroadcastChannel
       if (this.broadcastChannel) {
         try {
           this.broadcastChannel.postMessage({ type: "CONFIG_UPDATED", config: merged });
         } catch (_) {}
       }
 
-      // 3. Global Remote Sync via Firebase Firestore
-      this.syncToFirestore(merged);
+      // 3. Global Remote Broadcast to ALL visitors worldwide via Firebase Realtime Database
+      await this.syncToRealtimeDatabase(merged);
 
       return true;
     } catch (e) {
@@ -80,7 +96,7 @@ class PixoraConfig {
     }
   }
 
-  static reset() {
+  static async reset() {
     localStorage.removeItem("pixora_config");
     window.dispatchEvent(new Event("pixora_config_changed"));
     this.renderGlobalBanners();
@@ -89,65 +105,56 @@ class PixoraConfig {
         this.broadcastChannel.postMessage({ type: "CONFIG_RESET" });
       } catch (_) {}
     }
-    this.syncToFirestore(DEFAULT_CONFIG);
+    await this.syncToRealtimeDatabase(DEFAULT_CONFIG);
     return DEFAULT_CONFIG;
   }
 
-  static async syncToFirestore(configData) {
+  static async syncToRealtimeDatabase(configData) {
     try {
-      if (!this.firestoreDb) {
-        await this.initFirebaseFirestore();
+      if (!this.rtdb) {
+        await this.initRealtimeDatabase();
       }
-      if (this.firestoreDb && window.PixoraFirestoreModules) {
-        const { doc, setDoc } = window.PixoraFirestoreModules;
-        await setDoc(doc(this.firestoreDb, "pixora_system", "global_config"), configData, { merge: true });
-        console.log("[PIXORA Realtime] Global configuration synced to Firebase Firestore.");
+      if (this.rtdb && this.rtdbRef && this.rtdbSet) {
+        const targetRef = this.rtdbRef(this.rtdb, "pixora_config");
+        await this.rtdbSet(targetRef, configData);
+        console.log("[PIXORA Realtime] Successfully broadcasted to Firebase Realtime Database!");
       }
     } catch (err) {
-      // Gracefully silent if network offline or Firestore permissions still pending
-      console.info("[PIXORA Realtime] Firestore cloud sync notice:", err.message);
+      console.warn("[PIXORA Realtime] Realtime Database sync notice:", err.message);
     }
   }
 
-  static async initFirebaseFirestore() {
-    if (this.firestoreDb) return;
+  static async initRealtimeDatabase() {
+    if (this.rtdb) return;
     try {
       const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-      const { getFirestore, doc, onSnapshot, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const { getDatabase, ref, set, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
 
-      window.PixoraFirestoreModules = { doc, setDoc };
+      this.rtdbRef = ref;
+      this.rtdbSet = set;
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
-        authDomain: "pixora-7dc8f.firebaseapp.com",
-        projectId: "pixora-7dc8f",
-        storageBucket: "pixora-7dc8f.firebasestorage.app",
-        messagingSenderId: "221600400260",
-        appId: "1:221600400260:web:98450bf56be66b46c613d1",
-        measurementId: "G-7B2V7VDSWP"
-      };
-
-      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-      this.firestoreDb = getFirestore(app);
+      const app = getApps().length === 0 ? initializeApp(FIREBASE_CONFIG) : getApps()[0];
+      this.rtdb = getDatabase(app, FIREBASE_CONFIG.databaseURL);
 
       // Listen to real-time changes across the entire world!
-      onSnapshot(doc(this.firestoreDb, "pixora_system", "global_config"), (snapshot) => {
+      const configRef = ref(this.rtdb, "pixora_config");
+      onValue(configRef, (snapshot) => {
         if (snapshot.exists()) {
-          const remoteData = snapshot.data();
+          const remoteData = snapshot.val();
           const current = this.get();
-          // Avoid loop if already identical
+          // Update only when changed to avoid cycles
           if (JSON.stringify(remoteData) !== JSON.stringify(current)) {
-            console.log("[PIXORA Realtime] Incoming live config update from Firebase Firestore!");
+            console.log("[PIXORA Realtime] Received live update from Firebase Realtime Database!");
             localStorage.setItem("pixora_config", JSON.stringify(remoteData));
             window.dispatchEvent(new Event("pixora_config_changed"));
             PixoraConfig.renderGlobalBanners();
           }
         }
       }, (err) => {
-        console.info("[PIXORA Realtime] Firestore live listener:", err.message);
+        console.info("[PIXORA Realtime] Realtime Database listener notice:", err.message);
       });
     } catch (e) {
-      console.info("[PIXORA Realtime] Local sync active (Firestore cloud fallback):", e.message);
+      console.info("[PIXORA Realtime] Realtime DB fallback:", e.message);
     }
   }
 
@@ -258,10 +265,10 @@ if (typeof window !== "undefined") {
     PixoraConfig.renderGlobalBanners();
   });
 
-  // 4. Initial DOM mount and Firestore Cloud sync listener
+  // 4. Initial DOM mount and Realtime Database Cloud sync listener
   const onReady = () => {
     PixoraConfig.renderGlobalBanners();
-    PixoraConfig.initFirebaseFirestore();
+    PixoraConfig.initRealtimeDatabase();
   };
 
   if (document.readyState === "loading") {
