@@ -471,7 +471,11 @@
           } else if (error.code === "auth/operation-not-allowed") {
             loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>You can enable it in Firebase Console &rarr; Authentication, or use the Admin Master Passcode below.</span>";
           } else if (error.code === "auth/unauthorized-domain") {
-            loginErrorText.innerHTML = "Current domain not yet added to Firebase Authorized Domains.<br/><span class='text-[11px] text-slate-300'>Use the Admin Master Passcode below to enter console immediately.</span>";
+            const currentHost = window.location.hostname || "your domain";
+            loginErrorText.innerHTML = `Domain <strong>${currentHost}</strong> is not yet added in Firebase.<br/><span class='text-[11px] text-slate-300'>Add <strong>${currentHost}</strong> in Firebase Console &rarr; Auth &rarr; Settings &rarr; Authorized domains.<br/>Or enter Admin Passcode below to unlock now:</span>`;
+            // Auto open passcode form for convenience
+            directPassForm.classList.remove("hidden");
+            adminPassInput.focus();
           } else if (error.code !== "auth/popup-closed-by-user") {
             loginErrorText.innerText = "Authentication Notice: " + (error.message || "Failed to complete Google Sign-In.");
             googleRedirectAction.classList.remove("hidden");
