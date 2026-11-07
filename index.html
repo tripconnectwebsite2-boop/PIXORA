@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIXORA — Find the Best. Skip the Rest. | by AB Designing</title>
+
+  <!-- Strict Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://storage.googleapis.com blob: data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data: https://cdn.jsdelivr.net https://storage.googleapis.com;">
+
+  <!-- Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP NAVIGATION -->
+  <header class="glass-nav sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo Wordmark -->
+      <a href="index.html" class="flex items-center group">
+        <span class="text-2xl font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 select-none group-hover:opacity-90 transition-opacity">PIXORA</span>
+      </a>
+
+      <!-- Center Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-300">
+        <a href="index.html" class="text-white">Overview</a>
+        <a href="studio.html" class="hover:text-white transition-colors">Studio</a>
+        <a href="technology.html" class="hover:text-white transition-colors">Technology</a>
+        <a href="about.html" class="hover:text-white transition-colors">About</a>
+        <a href="privacy.html" class="hover:text-white transition-colors">Privacy</a>
+      </nav>
+
+      <!-- Launch Studio Button -->
+      <div class="flex items-center gap-3">
+        <a href="studio.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all flex items-center gap-2 group">
+          <span>Launch Studio</span>
+          <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+    <!-- Ambient Glow Backgrounds -->
+    <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-[750px] h-[380px] bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute top-1/2 -left-40 w-96 h-96 bg-fuchsia-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto space-y-6 relative z-10">
+      
+      <!-- Company Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.05] border border-white/10 text-xs font-semibold text-indigo-300 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+        <span>A Flagship Product of AB Designing</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+        Find the Best.<br/>
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300">
+          Skip the Rest.
+        </span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+        The ultimate curation suite for wedding and event photographers. Automatically filter closed eyes, squinting kids, blurry shots, and duplicate burst sequences in seconds on your own device.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
+        <a href="studio.html" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-500/30 hover:scale-105 transition-all flex items-center gap-2">
+          <span>Start Culling Free</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+
+        <a href="#features" class="px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 border border-white/10 font-semibold text-sm transition-all flex items-center gap-2">
+          <span>Explore Capabilities</span>
+        </a>
+      </div>
+
+      <!-- Live Metric Counter -->
+      <div class="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
+        <div class="flex items-center gap-1.5"><span class="text-white font-bold">100%</span> Private Air-Gapped</div>
+        <div>•</div>
+        <div class="flex items-center gap-1.5"><span class="text-emerald-400 font-bold">0 Bytes</span> Uploaded</div>
+        <div>•</div>
+        <div class="flex items-center gap-1.5"><span class="text-indigo-400 font-bold">PIXORA Neural AI</span> In-Browser Precision</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTERACTIVE BIOMETRIC SIMULATION SHOWCASE -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="glass-panel glow-card rounded-3xl p-6 sm:p-10 relative overflow-hidden border border-white/10">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        
+        <div class="space-y-4">
+          <div class="text-xs font-mono uppercase tracking-widest text-indigo-400">Precision Detection</div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            Accurate on Group Photos & Kids.
+          </h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Children and group members often blink or squint awkwardly. PIXORA's multi-face landmark tracking isolates micro-blinks across up to 12 subjects simultaneously without false-tagging happy smiling eyes.
+          </p>
+
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
+              Ear Aspect Ratio Analysis
+            </span>
+            <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold">
+              Burst Cluster Engine
+            </span>
+          </div>
+        </div>
+
+        <!-- Simulated Biometric Scan Frame -->
+        <div class="relative aspect-[4/3] rounded-2xl bg-black/60 border border-white/15 overflow-hidden shadow-2xl flex items-center justify-center">
+          <!-- Laser Line -->
+          <div class="face-laser-line"></div>
+
+          <!-- Target Box -->
+          <div class="absolute inset-8 border border-indigo-500/40 rounded-xl flex flex-col items-center justify-center space-y-2">
+            <div class="w-14 h-14 rounded-full border border-emerald-400/50 flex items-center justify-center text-emerald-400 font-mono text-xs animate-pulse">
+              99.2%
+            </div>
+            <div class="text-xs font-bold text-emerald-300">Open Eyes • Sharp Focus</div>
+            <div class="text-[10px] font-mono text-slate-400">Laplacian Variance: 154 | Face Count: 4</div>
+          </div>
+
+          <!-- Bottom Telemetry HUD -->
+          <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-slate-400 border-t border-white/10 pt-2">
+            <span>PIXORA MULTI-FACE AI</span>
+            <span class="text-indigo-400">LOCAL DEVICE ACCELERATED</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center max-w-2xl mx-auto mb-14 space-y-2.5">
+      <div class="text-xs font-mono uppercase tracking-widest text-indigo-400">Core Engine</div>
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Curation Without Limits</h2>
+      <p class="text-sm text-slate-400">Engineered by AB Designing for high-volume wedding workflows.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Card 1 -->
+      <div class="glass-panel glow-card rounded-2xl p-7 space-y-3.5">
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Smart Blink & Squint Guard</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Sub-millimeter landmark tracking detects closed eyes, drowsy expressions, and blinking kids with zero cloud dependency.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass-panel glow-card rounded-2xl p-7 space-y-3.5">
+        <div class="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 flex items-center justify-center text-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Burst Duplicate Clustering</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Perceptual difference hashing isolates identical burst shots, automatically highlighting the sharpest keeper.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div id="ai-vision" class="glass-panel glow-card rounded-2xl p-7 space-y-3.5">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">PIXORA Vision Architecture</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Proprietary neural pipeline rates pose aesthetics, identifies golden-ratio framing, and marks memorable wedding highlights with zero cloud latency.
+        </p>
+      </div>
+
+      <!-- Card 4: VIP Person Finder -->
+      <div class="glass-panel glow-card rounded-2xl p-7 space-y-3.5 border border-indigo-500/30 md:col-span-3 bg-gradient-to-r from-indigo-950/20 via-black/40 to-violet-950/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+              <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold">Biometric Intelligence</span>
+            </div>
+            <h3 class="text-xl font-bold text-white">VIP Person Finder • "Find Me"</h3>
+            <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+              Upload a single reference selfie or portrait of any wedding guest or relative. PIXORA scans thousands of photos, isolates every frame containing them, and delivers a personalized curated album in seconds.
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <a href="studio.html" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/25 transition-all inline-flex items-center gap-2">
+              <span>Try Person Finder</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-white/[0.08] bg-black py-12 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
+        <div class="flex items-center gap-3">
+          <span class="text-base font-extrabold text-white tracking-wider">PIXORA</span>
+          <span>•</span>
+          <span>A Product of AB Designing</span>
+        </div>
+
+        <div class="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 font-medium">
+          Designed by <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-pink-400 font-semibold underline underline-offset-2 transition-colors cursor-pointer" title="Open Adharsh's Instagram">Adharsh</a> | AB Designing
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <p>© 2026 AB Designing. All rights reserved.</p>
+        <div class="flex items-center space-x-6">
+          <a href="index.html" class="hover:text-white transition-colors">Overview</a>
+          <a href="studio.html" class="hover:text-white transition-colors">Studio</a>
+          <a href="about.html" class="hover:text-white transition-colors">About Us</a>
+          <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <script src="js/page-transitions.js"></script>
+</body>
+</html>

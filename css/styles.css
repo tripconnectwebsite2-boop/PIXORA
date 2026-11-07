@@ -1,0 +1,178 @@
+/* ==========================================================================
+   PIXORA — Luxury Dark Photography Studio Theme & Keyframe Animations
+   A Product of AB Designing | Designed by Adharsh
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-main: #07090e;
+  --bg-card: rgba(15, 23, 42, 0.7);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(99, 102, 241, 0.35);
+  --brand-purple: #818cf8;
+  --brand-emerald: #10b981;
+  --brand-rose: #f43f5e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.14) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.10) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: #f1f5f9;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Page Transition Loading Bar */
+#pageLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #10b981);
+  box-shadow: 0 0 12px #6366f1;
+  z-index: 9999;
+  transition: width 0.3s ease-out, opacity 0.4s ease-out;
+  pointer-events: none;
+}
+
+/* Glassmorphism Surfaces */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-nav {
+  background: rgba(7, 9, 14, 0.82);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+/* Glowing text & cards */
+.glow-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-card:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 25px -5px rgba(99, 102, 241, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Animated Logo Aperture */
+@keyframes apertureRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.aperture-animate {
+  transform-origin: center;
+  animation: apertureRotate 24s linear infinite;
+}
+
+.aperture-animate:hover {
+  animation-duration: 8s;
+}
+
+/* FaceID Laser Scan Animation */
+@keyframes laserScanSweep {
+  0% { top: 0%; opacity: 0.8; }
+  50% { top: 98%; opacity: 1; }
+  100% { top: 0%; opacity: 0.8; }
+}
+
+.face-laser-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #818cf8, #38bdf8, #10b981, transparent);
+  box-shadow: 0 0 16px #818cf8, 0 0 30px #38bdf8;
+  animation: laserScanSweep 1.2s ease-in-out infinite;
+  z-index: 20;
+}
+
+/* Futuristic Biometric HUD Target */
+@keyframes hudScanPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+.hud-target-reticle {
+  animation: hudScanPulse 1.4s ease-in-out infinite;
+}
+
+.hud-bracket {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.hud-tl { top: 4px; left: 4px; border-top: 2px solid #818cf8; border-left: 2px solid #818cf8; }
+.hud-tr { top: 4px; right: 4px; border-top: 2px solid #818cf8; border-right: 2px solid #818cf8; }
+.hud-bl { bottom: 4px; left: 4px; border-bottom: 2px solid #818cf8; border-left: 2px solid #818cf8; }
+.hud-br { bottom: 4px; right: 4px; border-bottom: 2px solid #818cf8; border-right: 2px solid #818cf8; }
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.8s infinite;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #07090e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

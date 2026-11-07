@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PIXORA — Official Product Overview & System Architecture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.55;
+      font-size: 13px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 24px 32px;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: #0f172a;
+    }
+
+    .brand-title span {
+      color: #4f46e5;
+    }
+
+    .tagline {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6366f1;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    .meta-box {
+      text-align: right;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .meta-box strong {
+      color: #1e293b;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      background: #eef2ff;
+      color: #4f46e5;
+      border: 1px solid #c7d2fe;
+      margin-top: 4px;
+    }
+
+    /* Sections */
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 22px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 4px solid #4f46e5;
+      padding-left: 10px;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: #334155;
+    }
+
+    .lead-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      font-size: 13.5px;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Feature Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4f46e5;
+      display: inline-block;
+    }
+
+    .card-desc {
+      font-size: 11.5px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px 0;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      color: #334155;
+    }
+
+    .status-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .status-green { background: #dcfce7; color: #15803d; }
+    .status-blue { background: #e0e7ff; color: #4338ca; }
+    .status-amber { background: #fef3c7; color: #b45309; }
+
+    /* Highlights list */
+    ul {
+      margin-left: 18px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 30px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .footer strong {
+      color: #0f172a;
+    }
+
+    .print-bar {
+      background: #4f46e5;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .print-btn {
+      background: white;
+      color: #4f46e5;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media print {
+      .print-bar { display: none; }
+      .container { padding: 0; }
+      body { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="print-bar">
+      <span>📄 PIXORA Documentation & System Specification</span>
+      <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <h1 class="brand-title">PIXORA<span>.</span></h1>
+        <div class="tagline">Find the Best. Skip the Rest.</div>
+        <div class="badge">Production Build v8.0</div>
+      </div>
+      <div class="meta-box">
+        <div><strong>Product of:</strong> AB Designing</div>
+        <div><strong>Lead Designer:</strong> Adharsh</div>
+        <div><strong>Engine:</strong> PIXORA Neural Mesh v5.0</div>
+        <div><strong>Date:</strong> November 2026</div>
+      </div>
+    </header>
+
+    <!-- Executive Summary -->
+    <div class="lead-box">
+      <strong>PIXORA</strong> is a high-speed, 100% client-side, air-gapped AI photo culling and album curation studio designed for professional wedding photographers, studios, and album designers. It eliminates hours of manual photo selection by instantly detecting eye blinks, camera blur, dark/blown exposures, and duplicate burst shots while preserving emotional heritage and newborn baby portraits.
+    </div>
+
+    <!-- Core Architecture Pillars -->
+    <h2>1. Core Capabilities & Intelligence</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> 100% Client-Side Privacy (Air-Gapped)</div>
+        <div class="card-desc">Zero bytes uploaded to any external server or cloud. All neural inference runs directly inside the client's browser using WebAssembly & GPU acceleration. Full privacy for high-profile weddings.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Multi-Face Interactive Picker</div>
+        <div class="card-desc">When a reference photo contains multiple subjects, PIXORA detects every face (up to 64 people) and renders clickable square reticles with thumbnail cards to lock the target subject.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Dual-Metric Biometrics (Zero False Matches)</div>
+        <div class="card-desc">Employs L2 Euclidean Distance (&le; 0.20) and relative facial proportions across 12 biometric landmarks. Completely eliminates accidental stranger matches from web images.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Baby & Infant Eye Culling Immunity</div>
+        <div class="card-desc">Recognizes baby and infant cranial morphology. Sleeping babies are celebrated as prized portraits and are never falsely flagged as closed-eye blinks or flaws.</div>
+      </div>
+    </div>
+
+    <!-- Decision Engine Matrix -->
+    <h2>2. Neural Culling Decision Matrix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Condition Evaluated</th>
+          <th>Culling Verdict</th>
+          <th>Special Exemption</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Eyes / Blinks</strong></td>
+          <td>Eye Aspect Ratio (EAR) &lt; 0.165</td>
+          <td><span class="status-pill status-amber">Moved to Bad</span></td>
+          <td>Babies & downward ritual prayers (thali tying) kept in Good</td>
+        </tr>
+        <tr>
+          <td><strong>Shutter Shake</strong></td>
+          <td>Laplacian Variance &lt; 7 (subjects) / &lt; 10</td>
+          <td><span class="status-pill status-amber">Moved to Bad</span></td>
+          <td>Creamy bokeh portraits (f/1.4 - f/2.8) & dance motion preserved</td>
+        </tr>
+        <tr>
+          <td><strong>Burst Duplicates</strong></td>
+          <td>Perceptual dHash Distance &le; 10 (&le; 5s apart)</td>
+          <td><span class="status-pill status-blue">Duplicate Twin</span></td>
+          <td>Highest pose score & sharpest frame locked as Burst Leader in Good</td>
+        </tr>
+        <tr>
+          <td><strong>Target Person</strong></td>
+          <td>L2 Euclidean Distance &le; 0.20 on biometric landmarks</td>
+          <td><span class="status-pill status-green">Target Matched</span></td>
+          <td>Stranger photos rejected with 0% false positives</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pro Features -->
+    <h2>3. Professional Workflow Features</h2>
+    <ul>
+      <li><strong>VIP Person Finder ("Find Me"):</strong> Allows instant filtering and dedicated ZIP export of all good captures of any guest, bride, groom, or VIP in an album.</li>
+      <li><strong>AI 50 Best Album Highlights:</strong> Automatically samples balanced, hero-tier captures across the full wedding timeline for instant album layout design.</li>
+      <li><strong>Burst Twin Side-by-Side Comparison:</strong> Side-by-side inspection with synchronized zoom to verify facial focus between duplicate shots.</li>
+      <li><strong>In-Browser Multi-threaded ZIP Export:</strong> Streams full-resolution curated albums directly into compressed archives without leaving the workstation.</li>
+      <li><strong>Seamless Keyboard Navigation:</strong> Fast culling via keyboard shortcuts (G for Good, B for Bad, Del for Trash, Arrows for Lightbox navigation).</li>
+    </ul>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div><strong>PIXORA Studio</strong> • A Product of <strong>AB Designing</strong></div>
+      <div>Designed by <strong>Adharsh</strong> | All Rights Reserved &copy; 2026</div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

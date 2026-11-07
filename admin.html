@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIXORA — Admin & System Console</title>
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com blob: data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data:;">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-white selection:text-black">
+
+  <!-- NAVIGATION -->
+  <header class="apple-nav sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 group">
+        <span class="text-xl font-extrabold tracking-widest text-white select-none">PIXORA</span>
+        <span class="text-xs font-mono uppercase px-2 py-0.5 rounded-full bg-white/[0.08] text-neutral-300 border border-white/10">Console</span>
+      </a>
+
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-medium text-neutral-400">
+        <a href="index.html" class="hover:text-white transition-colors">Overview</a>
+        <a href="studio.html" class="hover:text-white transition-colors">Studio</a>
+        <a href="about.html" class="hover:text-white transition-colors">About</a>
+        <a href="admin.html" class="text-white font-semibold">Admin</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="studio.html" class="apple-btn-primary text-xs py-2 px-5">Open Studio</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN ADMIN CONSOLE -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 space-y-8">
+    
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">System Control Console</h1>
+        <p class="text-xs text-neutral-400 mt-1">Configure global notifications, tune computer vision thresholds, and monitor telemetry.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="saveStatusIndicator" class="hidden text-xs text-emerald-400 font-mono px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          Saved to Local System
+        </span>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION & BROADCAST SECTION -->
+    <section class="apple-card p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between">
+        <div class="space-y-1">
+          <h2 class="text-lg font-bold text-white">Broadcast Announcement Banner</h2>
+          <p class="text-xs text-neutral-400">Display an alert or notice across the entire website when visitors open any page.</p>
+        </div>
+
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="announcementActive" class="sr-only peer">
+          <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
+
+      <div class="space-y-4 pt-2">
+        <div>
+          <label class="block text-xs font-semibold text-neutral-300 mb-2 font-mono uppercase">Notification Message Text</label>
+          <input type="text" id="announcementText" placeholder="e.g. System Notice: New AI Focus algorithms are now active." class="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 font-mono" />
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="text-xs text-neutral-300 font-medium">Notification Style:</label>
+          <label class="inline-flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+            <input type="radio" name="announcementType" value="info" checked class="text-blue-600 bg-neutral-900 border-neutral-700 focus:ring-0">
+            <span>Informational (Blue)</span>
+          </label>
+          <label class="inline-flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+            <input type="radio" name="announcementType" value="alert" class="text-red-600 bg-neutral-900 border-neutral-700 focus:ring-0">
+            <span>Critical Alert (Red)</span>
+          </label>
+        </div>
+
+        <div class="pt-2">
+          <button id="btnSaveAnnouncement" class="apple-btn-primary text-xs py-2 px-5">
+            Publish Announcement
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALGORITHM SENSITIVITY CALIBRATION -->
+    <section class="apple-card p-6 sm:p-8 space-y-6">
+      <div>
+        <h2 class="text-lg font-bold text-white">Algorithm & Quality Calibration</h2>
+        <p class="text-xs text-neutral-400 mt-1">Fine-tune the neural eye detection and focus thresholds to accommodate varied wedding lighting conditions.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        
+        <!-- Closed Eye Aspect Ratio -->
+        <div class="space-y-2 bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06]">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-neutral-200">Blink / Closed Eyes (EAR)</span>
+            <span id="valEarBlink" class="font-mono text-blue-400 font-bold">0.17</span>
+          </div>
+          <input type="range" id="inputEarBlink" min="0.12" max="0.22" step="0.01" value="0.17" class="w-full accent-blue-500 cursor-pointer" />
+          <p class="text-[11px] text-neutral-500">Below this ratio, eyes are categorized as completely closed.</p>
+        </div>
+
+        <!-- Half-Closed Drowsy Eye Ratio -->
+        <div class="space-y-2 bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06]">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-neutral-200">Half-Closed / Drowsy (EAR)</span>
+            <span id="valEarHalf" class="font-mono text-blue-400 font-bold">0.20</span>
+          </div>
+          <input type="range" id="inputEarHalf" min="0.16" max="0.26" step="0.01" value="0.20" class="w-full accent-blue-500 cursor-pointer" />
+          <p class="text-[11px] text-neutral-500">Flags awkward half-closed lids without marking smiling squinting.</p>
+        </div>
+
+        <!-- Blur / Focus Sharpness Threshold -->
+        <div class="space-y-2 bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06]">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-neutral-200">Blur Cutoff (Laplacian Variance)</span>
+            <span id="valBlur" class="font-mono text-blue-400 font-bold">85</span>
+          </div>
+          <input type="range" id="inputBlur" min="40" max="160" step="5" value="85" class="w-full accent-blue-500 cursor-pointer" />
+          <p class="text-[11px] text-neutral-500">Lower values accept softer lenses; higher values demand crisp focus.</p>
+        </div>
+
+        <!-- Duplicate Distance -->
+        <div class="space-y-2 bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06]">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-neutral-200">Burst Duplicate Distance (dHash)</span>
+            <span id="valDuplicate" class="font-mono text-blue-400 font-bold">10</span>
+          </div>
+          <input type="range" id="inputDuplicate" min="5" max="18" step="1" value="10" class="w-full accent-blue-500 cursor-pointer" />
+          <p class="text-[11px] text-neutral-500">Hamming distance threshold for clustering continuous burst captures.</p>
+        </div>
+
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button id="btnSaveAlgorithm" class="apple-btn-primary text-xs py-2 px-5">
+          Save Calibration
+        </button>
+        <button id="btnResetDefaults" class="apple-btn-secondary text-xs py-2 px-4">
+          Reset Factory Defaults
+        </button>
+      </div>
+    </section>
+
+    <!-- LIVE TELEMETRY & SECURITY VERIFICATION -->
+    <section class="apple-card p-6 sm:p-8 space-y-4">
+      <h2 class="text-lg font-bold text-white">Live System Telemetry & Audits</h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1 font-mono text-xs">
+        <div class="bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06] space-y-1">
+          <div class="text-neutral-500">HOST STATUS</div>
+          <div class="text-emerald-400 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Online (Port 3000)</span>
+          </div>
+        </div>
+
+        <div class="bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06] space-y-1">
+          <div class="text-neutral-500">AIR-GAP SECURITY</div>
+          <div class="text-blue-400 font-bold">Zero Outbound Leakage</div>
+        </div>
+
+        <div class="bg-neutral-900/60 p-4 rounded-xl border border-white/[0.06] space-y-1">
+          <div class="text-neutral-500">DESIGN ARCHITECTURE</div>
+          <div class="text-white font-bold">Designed by Adharsh</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-white/[0.08] bg-black py-8 text-xs text-neutral-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">PIXORA Console</span>
+        <span>•</span>
+        <span>Secure Local Management</span>
+      </div>
+      <div class="text-[11px] text-neutral-400">
+        <span>Designed by Adharsh | AB Designing</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const config = PixoraConfig.get();
+
+      // Announcement fields
+      const chkActive = document.getElementById("announcementActive");
+      const txtAnnouncement = document.getElementById("announcementText");
+      const btnSaveAnn = document.getElementById("btnSaveAnnouncement");
+      const saveStatus = document.getElementById("saveStatusIndicator");
+
+      chkActive.checked = config.announcement ? config.announcement.active : false;
+      txtAnnouncement.value = config.announcement ? config.announcement.text : "";
+
+      const radioTypes = document.querySelectorAll('input[name="announcementType"]');
+      radioTypes.forEach(r => {
+        if (r.value === (config.announcement ? config.announcement.type : "info")) {
+          r.checked = true;
+        }
+      });
+
+      // Algorithm fields
+      const inEarBlink = document.getElementById("inputEarBlink");
+      const inEarHalf = document.getElementById("inputEarHalf");
+      const inBlur = document.getElementById("inputBlur");
+      const inDup = document.getElementById("inputDuplicate");
+
+      const valEarBlink = document.getElementById("valEarBlink");
+      const valEarHalf = document.getElementById("valEarHalf");
+      const valBlur = document.getElementById("valBlur");
+      const valDup = document.getElementById("valDuplicate");
+
+      inEarBlink.value = config.earBlinkThreshold;
+      valEarBlink.innerText = config.earBlinkThreshold;
+      inEarHalf.value = config.earHalfClosedThreshold;
+      valEarHalf.innerText = config.earHalfClosedThreshold;
+      inBlur.value = config.blurThreshold;
+      valBlur.innerText = config.blurThreshold;
+      inDup.value = config.duplicateDistance;
+      valDup.innerText = config.duplicateDistance;
+
+      // Sliders event listeners
+      inEarBlink.addEventListener("input", (e) => valEarBlink.innerText = e.target.value);
+      inEarHalf.addEventListener("input", (e) => valEarHalf.innerText = e.target.value);
+      inBlur.addEventListener("input", (e) => valBlur.innerText = e.target.value);
+      inDup.addEventListener("input", (e) => valDup.innerText = e.target.value);
+
+      function showSaved() {
+        saveStatus.classList.remove("hidden");
+        setTimeout(() => saveStatus.classList.add("hidden"), 3000);
+      }
+
+      btnSaveAnn.addEventListener("click", () => {
+        const selectedType = document.querySelector('input[name="announcementType"]:checked')?.value || "info";
+        PixoraConfig.save({
+          announcement: {
+            active: chkActive.checked,
+            text: txtAnnouncement.value.trim(),
+            type: selectedType
+          }
+        });
+        showSaved();
+      });
+
+      document.getElementById("btnSaveAlgorithm").addEventListener("click", () => {
+        PixoraConfig.save({
+          earBlinkThreshold: parseFloat(inEarBlink.value),
+          earHalfClosedThreshold: parseFloat(inEarHalf.value),
+          blurThreshold: parseInt(inBlur.value, 10),
+          duplicateDistance: parseInt(inDup.value, 10)
+        });
+        showSaved();
+      });
+
+      document.getElementById("btnResetDefaults").addEventListener("click", () => {
+        if (confirm("Reset calibration to factory defaults?")) {
+          PixoraConfig.reset();
+          location.reload();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

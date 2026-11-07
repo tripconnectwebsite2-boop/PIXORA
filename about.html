@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About PIXORA — AB Designing</title>
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com blob: data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data:;">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- NAVIGATION -->
+  <header class="glass-nav sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Brand Logo Wordmark -->
+      <a href="index.html" class="flex items-center group">
+        <span class="text-2xl font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 select-none group-hover:opacity-90 transition-opacity">PIXORA</span>
+      </a>
+
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-400">
+        <a href="index.html" class="hover:text-white transition-colors">Overview</a>
+        <a href="studio.html" class="hover:text-white transition-colors">Studio</a>
+        <a href="technology.html" class="hover:text-white transition-colors">Technology</a>
+        <a href="about.html" class="text-white font-bold">About Us</a>
+        <a href="privacy.html" class="hover:text-white transition-colors">Privacy</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="studio.html" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg transition-all">
+          Launch Studio
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-1 space-y-16">
+    
+    <div class="space-y-4 text-center max-w-2xl mx-auto">
+      <div class="text-xs font-mono uppercase tracking-widest text-indigo-400">The Creators</div>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+        Born at AB Designing.
+      </h1>
+      <p class="text-base text-slate-300 leading-relaxed">
+        PIXORA is crafted by AB Designing to solve the single most exhausting bottleneck in professional wedding photography: manual culling.
+      </p>
+    </div>
+
+    <!-- DESIGNER SPOTLIGHT CARD -->
+    <section class="glass-panel glow-card rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-white/10">
+      <div class="absolute -top-10 -right-10 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
+        <div class="space-y-3 max-w-xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-xs font-mono text-indigo-300">
+            <span>Product Architecture & Creative Direction</span>
+          </div>
+          <h2 class="text-3xl font-extrabold text-white">Designed by Adharsh</h2>
+          <div class="text-xs font-semibold text-indigo-400">AB Designing Team Lead</div>
+          <p class="text-sm text-slate-300 leading-relaxed pt-1">
+            "We built PIXORA because wedding photographers were spending 8 to 15 hours after every event sorting through thousands of burst captures, blurry dance floor shots, and closed eyes. PIXORA puts AI to work on your machine, ensuring 100% client privacy with zero cloud bills."
+          </p>
+        </div>
+
+        <div class="px-7 py-5 rounded-3xl bg-neutral-900/90 border border-white/20 flex flex-col items-center justify-center text-white shadow-2xl flex-shrink-0">
+          <span class="text-2xl font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">PIXORA</span>
+          <span class="text-[10px] font-mono text-indigo-300 uppercase mt-0.5">AB Designing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPANY MISSION -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="glass-panel glow-card rounded-2xl p-7 space-y-3">
+        <h3 class="text-lg font-bold text-white">About AB Designing</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          AB Designing is a forward-thinking digital product and design studio dedicated to crafting software tools that combine aesthetic elegance with high-performance local computing.
+        </p>
+      </div>
+
+      <div class="glass-panel glow-card rounded-2xl p-7 space-y-3">
+        <h3 class="text-lg font-bold text-white">The Air-Gapped Standard</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          In an era of rampant cloud data breaches, AB Designing designed PIXORA to operate 100% inside your browser's private sandbox. No client photo is ever transmitted to a company server.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-white/[0.08] bg-black py-8 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <span class="font-bold text-white">PIXORA by AB Designing</span>
+        <span>•</span>
+        <span>Find the Best. Skip the Rest.</span>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        <span>Designed by Adharsh | AB Designing</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/page-transitions.js"></script>
+</body>
+</html>

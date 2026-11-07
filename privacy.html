@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — PIXORA | AB Designing</title>
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com blob: data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data:;">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- NAVIGATION -->
+  <header class="glass-nav sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Brand Logo Wordmark -->
+      <a href="index.html" class="flex items-center group">
+        <span class="text-2xl font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 select-none group-hover:opacity-90 transition-opacity">PIXORA</span>
+      </a>
+
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-400">
+        <a href="index.html" class="hover:text-white transition-colors">Overview</a>
+        <a href="studio.html" class="hover:text-white transition-colors">Studio</a>
+        <a href="technology.html" class="hover:text-white transition-colors">Technology</a>
+        <a href="about.html" class="hover:text-white transition-colors">About Us</a>
+        <a href="privacy.html" class="text-white font-bold">Privacy Policy</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="studio.html" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg transition-all">
+          Launch Studio
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 space-y-10">
+    
+    <div class="space-y-3">
+      <div class="text-xs font-mono uppercase tracking-widest text-indigo-400">Security & Trust</div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Privacy Architecture</h1>
+      <p class="text-xs text-slate-400 font-mono">Effective Date: November 2026 • Published by AB Designing</p>
+    </div>
+
+    <div class="glass-panel rounded-3xl p-8 sm:p-10 space-y-8 text-sm text-slate-300 leading-relaxed border border-white/10">
+      
+      <section class="space-y-2.5">
+        <h2 class="text-lg font-bold text-white">1. The Zero-Knowledge Guarantee</h2>
+        <p>
+          At AB Designing, we hold user privacy as a sacred principle. When you import 10 or 10,000 photos into PIXORA, your files remain strictly inside your device's random access memory (RAM). No photo binary is ever sent to AB Designing or stored on any central server.
+        </p>
+      </section>
+
+      <section class="space-y-2.5">
+        <h2 class="text-lg font-bold text-white">2. Local Computer Vision Sandbox</h2>
+        <p>
+          Laplacian focus scoring, perceptual hashing (dHash), and facial landmark blink evaluations are executed via local client-side WebAssembly. You can disconnect your device from the internet entirely and PIXORA will continue to process your photos without interruption.
+        </p>
+      </section>
+
+      <section class="space-y-2.5">
+        <h2 class="text-lg font-bold text-white">3. Proprietary PIXORA Neural Engine (100% In-Memory)</h2>
+        <p>
+          All biometric landmark mapping, facial proportions, VIP person matching, and aesthetic pose evaluations run directly on your GPU/CPU via WebAssembly. PIXORA relies on zero third-party cloud AI vendors or remote inference APIs. Your personal portraits and wedding albums remain strictly air-gapped on your device.
+        </p>
+      </section>
+
+      <section class="space-y-2.5">
+        <h2 class="text-lg font-bold text-white">4. No Tracking or Fingerprinting</h2>
+        <p>
+          PIXORA contains zero third-party advertising trackers, marketing pixels, or user behavior telemetry.
+        </p>
+      </section>
+
+      <div class="pt-4 border-t border-white/10 text-xs text-slate-400">
+        Questions regarding our privacy architecture? Contact AB Designing via our digital studio team.
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-white/[0.08] bg-black py-8 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <span class="font-bold text-white">PIXORA by AB Designing</span>
+        <span>•</span>
+        <span>Find the Best. Skip the Rest.</span>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        <span>Designed by Adharsh | AB Designing</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/page-transitions.js"></script>
+</body>
+</html>
