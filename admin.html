@@ -23,7 +23,7 @@
   <header class="glass-nav sticky top-0 z-40 border-b border-white/[0.08] bg-black/80 backdrop-blur-xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3 group">
-        <span class="text-2xl font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 select-none">PIXORA</span>
+        <img src="assets/pixora-logo.png" alt="PIXORA" class="h-7 sm:h-8 w-auto object-contain group-hover:opacity-90 transition-opacity" />
         <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">Admin Console</span>
       </a>
 
@@ -60,43 +60,28 @@
         <p class="text-xs text-slate-400">Restricted Access. Authorized Google Account credentials required.</p>
       </div>
 
-      <!-- Auth Form -->
-      <form id="adminLoginForm" class="space-y-4 pt-2">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5 font-mono uppercase">Authorized Google Email</label>
-          <div class="relative">
-            <input type="email" id="loginEmail" required placeholder="admin@gmail.com" class="w-full bg-black/60 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-mono transition-colors" />
-            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5 font-mono uppercase">Admin Password</label>
-          <div class="relative">
-            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-black/60 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-mono transition-colors" />
-            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Error Banner -->
-        <div id="loginErrorBanner" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span id="loginErrorText">Access Denied: Unauthorized Account</span>
-        </div>
-
-        <button type="submit" id="btnAdminLogin" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2">
-          <span>Authorize & Enter Console</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      <!-- Secure Google Sign-In Action -->
+      <div class="space-y-4 pt-2">
+        <button type="button" id="btnGoogleSignIn" class="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm shadow-xl transition-all flex items-center justify-center gap-3 border border-white/20 active:scale-[0.98] cursor-pointer">
+          <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span id="googleBtnText">Sign In with Google</span>
         </button>
+
+        <!-- Access Denied Banner -->
+        <div id="loginErrorBanner" class="hidden p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-shake">
+          <svg class="w-5 h-5 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span id="loginErrorText" class="font-medium">Access Denied: Unauthorized Account</span>
+        </div>
 
         <a href="index.html" class="block text-center text-xs text-slate-400 hover:text-white pt-2 transition-colors">
           &larr; Back to Public Website
         </a>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -337,34 +322,56 @@
   </footer>
 
   <script src="js/config.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const AUTHORIZED_ADMIN_EMAIL = "aswathybiju8562@gmail.com";
-      const DEFAULT_ADMIN_PASS = "admin123";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
+      authDomain: "pixora-7dc8f.firebaseapp.com",
+      projectId: "pixora-7dc8f",
+      storageBucket: "pixora-7dc8f.firebasestorage.app",
+      messagingSenderId: "542365287711",
+      appId: "1:542365287711:web:ca42ea8d53b925b42d7ad4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const AUTHORIZED_ADMIN_EMAILS = [
+      "tripconnectwebsite2@gmail.com",
+      "aswathybiju8562@gmail.com"
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
       const authGate = document.getElementById("adminAuthGate");
       const consolePanel = document.getElementById("adminConsolePanel");
-      const loginForm = document.getElementById("adminLoginForm");
-      const loginEmail = document.getElementById("loginEmail");
-      const loginPassword = document.getElementById("loginPassword");
+      const btnGoogleSignIn = document.getElementById("btnGoogleSignIn");
+      const googleBtnText = document.getElementById("googleBtnText");
       const loginErrorBanner = document.getElementById("loginErrorBanner");
       const loginErrorText = document.getElementById("loginErrorText");
       const btnLogout = document.getElementById("btnAdminLogout");
 
       // Check session auth
-      const isAuth = sessionStorage.getItem("pixora_admin_auth") === "true";
-      if (isAuth) {
-        unlockConsole();
+      const savedAuthEmail = sessionStorage.getItem("pixora_admin_user");
+      if (savedAuthEmail && AUTHORIZED_ADMIN_EMAILS.includes(savedAuthEmail.toLowerCase())) {
+        unlockConsole(savedAuthEmail);
       }
 
-      function unlockConsole() {
+      function unlockConsole(userEmail) {
         authGate.classList.add("hidden");
         consolePanel.classList.remove("hidden");
         btnLogout.classList.remove("hidden");
+        if (userEmail) {
+          console.log("[PIXORA Admin] Authenticated as:", userEmail);
+        }
       }
 
       function lockConsole() {
+        sessionStorage.removeItem("pixora_admin_user");
         sessionStorage.removeItem("pixora_admin_auth");
+        signOut(auth).catch(() => {});
         authGate.classList.remove("hidden");
         consolePanel.classList.add("hidden");
         btnLogout.classList.add("hidden");
@@ -374,28 +381,38 @@
         lockConsole();
       });
 
-      loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const inputMail = loginEmail.value.trim().toLowerCase();
-        const inputPass = loginPassword.value.trim();
+      btnGoogleSignIn.addEventListener("click", async () => {
+        loginErrorBanner.classList.add("hidden");
+        googleBtnText.innerText = "Signing in with Google...";
+        btnGoogleSignIn.disabled = true;
 
-        // Verify authorized Google account
-        const isAuthorizedEmail = (inputMail === AUTHORIZED_ADMIN_EMAIL.toLowerCase());
-        const isAuthorizedPass = (inputPass === DEFAULT_ADMIN_PASS || inputPass.length >= 6);
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const email = result.user?.email?.toLowerCase() || "";
 
-        if (isAuthorizedEmail && isAuthorizedPass) {
-          sessionStorage.setItem("pixora_admin_auth", "true");
-          loginErrorBanner.classList.add("hidden");
-          unlockConsole();
-        } else {
-          // Access Denied: Unauthorized Account
-          loginErrorBanner.classList.remove("hidden");
-          loginErrorText.innerText = "Access Denied: Unauthorized Account. Redirecting to home...";
-          
-          // Auto-redirect to home on unauthorized access
-          setTimeout(() => {
-            window.location.href = "index.html";
-          }, 1500);
+          if (AUTHORIZED_ADMIN_EMAILS.includes(email)) {
+            sessionStorage.setItem("pixora_admin_user", email);
+            sessionStorage.setItem("pixora_admin_auth", "true");
+            unlockConsole(email);
+          } else {
+            // Unauthorized Google Account
+            loginErrorBanner.classList.remove("hidden");
+            loginErrorText.innerHTML = `Access Denied: <strong>${email}</strong> is not an authorized administrator. Redirecting to home...`;
+            await signOut(auth);
+            
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1800);
+          }
+        } catch (error) {
+          console.error("Google Auth error:", error);
+          if (error.code !== "auth/popup-closed-by-user") {
+            loginErrorBanner.classList.remove("hidden");
+            loginErrorText.innerText = "Authentication Error: " + (error.message || "Failed to sign in with Google.");
+          }
+        } finally {
+          googleBtnText.innerText = "Sign In with Google";
+          btnGoogleSignIn.disabled = false;
         }
       });
 
