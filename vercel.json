@@ -2,6 +2,10 @@
   "version": 2,
   "name": "pixora-ab-designing",
   "cleanUrls": true,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/studio", "destination": "/studio.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

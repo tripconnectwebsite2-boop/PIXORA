@@ -1,0 +1,25 @@
+{
+  "name": "photo-finder",
+  "version": "1.0.0",
+  "description": "> **\"Find the Best. Skip the Rest.\"**   > *A Flagship Product of AB Designing | Designed by Adharsh*",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tripconnectwebsite2-boop/PIXORA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tripconnectwebsite2-boop/PIXORA/issues"
+  },
+  "homepage": "https://github.com/tripconnectwebsite2-boop/PIXORA#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
