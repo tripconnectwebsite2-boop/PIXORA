@@ -7,6 +7,7 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 export const firebaseConfig = {
   apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
   authDomain: "pixora-7dc8f.firebaseapp.com",
+  databaseURL: "https://pixora-7dc8f-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "pixora-7dc8f",
   storageBucket: "pixora-7dc8f.firebasestorage.app",
   messagingSenderId: "221600400260",
