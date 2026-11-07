@@ -339,13 +339,16 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
 
     const AUTHORIZED_ADMIN_EMAILS = [
       "tripconnectwebsite2@gmail.com",
       "aswathybiju8562@gmail.com"
     ];
 
-    document.addEventListener("DOMContentLoaded", () => {
+    function initAdmin() {
       const authGate = document.getElementById("adminAuthGate");
       const consolePanel = document.getElementById("adminConsolePanel");
       const btnGoogleSignIn = document.getElementById("btnGoogleSignIn");
@@ -353,6 +356,11 @@
       const loginErrorBanner = document.getElementById("loginErrorBanner");
       const loginErrorText = document.getElementById("loginErrorText");
       const btnLogout = document.getElementById("btnAdminLogout");
+
+      if (!btnGoogleSignIn) {
+        console.error("[PIXORA Admin] btnGoogleSignIn element not found");
+        return;
+      }
 
       // Check session auth
       const savedAuthEmail = sessionStorage.getItem("pixora_admin_user");
@@ -384,7 +392,7 @@
 
       btnGoogleSignIn.addEventListener("click", async () => {
         loginErrorBanner.classList.add("hidden");
-        googleBtnText.innerText = "Signing in with Google...";
+        googleBtnText.innerText = "Opening Google Accounts...";
         btnGoogleSignIn.disabled = true;
 
         try {
@@ -407,9 +415,19 @@
           }
         } catch (error) {
           console.error("Google Auth error:", error);
-          if (error.code !== "auth/popup-closed-by-user") {
-            loginErrorBanner.classList.remove("hidden");
-            loginErrorText.innerText = "Authentication Error: " + (error.message || "Failed to sign in with Google.");
+          loginErrorBanner.classList.remove("hidden");
+
+          if (error.code === "auth/popup-blocked") {
+            loginErrorText.innerHTML = "Browser blocked the popup window. Please allow popups for this site, or <button id='retryPopupBtn' class='underline font-bold text-white'>click here to try again</button>.";
+            document.getElementById("retryPopupBtn")?.addEventListener("click", () => btnGoogleSignIn.click());
+          } else if (error.code === "auth/operation-not-allowed") {
+            loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>Enable it at: Firebase Console &rarr; Authentication &rarr; Sign-in method &rarr; Google.</span>";
+          } else if (error.code === "auth/unauthorized-domain") {
+            loginErrorText.innerHTML = "Current domain is not authorized in Firebase.<br/><span class='text-[11px] text-slate-300'>Add domain under Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized Domains.</span>";
+          } else if (error.code !== "auth/popup-closed-by-user") {
+            loginErrorText.innerText = "Authentication Error: " + (error.message || "Failed to open Google account window.");
+          } else {
+            loginErrorBanner.classList.add("hidden");
           }
         } finally {
           googleBtnText.innerText = "Sign In with Google";
@@ -547,7 +565,13 @@
           location.reload();
         }
       });
-    });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initAdmin);
+    } else {
+      initAdmin();
+    }
   </script>
 </body>
 </html>
