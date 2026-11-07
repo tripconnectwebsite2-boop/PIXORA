@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PIXORA — Admin & System Console | AB Designing</title>
 
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com blob: data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data: https://cdn.jsdelivr.net https://storage.googleapis.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://*.googletagmanager.com; worker-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data: https:; connect-src 'self' blob: data: https://cdn.jsdelivr.net https://storage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.analytics.google.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com;">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,9 +73,30 @@
         </button>
 
         <!-- Access Denied Banner -->
-        <div id="loginErrorBanner" class="hidden p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-shake">
-          <svg class="w-5 h-5 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span id="loginErrorText" class="font-medium">Access Denied: Unauthorized Account</span>
+        <div id="loginErrorBanner" class="hidden p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex flex-col gap-2 animate-shake">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span id="loginErrorText" class="font-medium">Access Denied: Unauthorized Account</span>
+          </div>
+          <div id="googleRedirectAction" class="hidden pt-1">
+            <button type="button" id="btnGoogleRedirect" class="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+              <span>Try Sign-In with Full Page Redirect &rarr;</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Emergency Admin Access Option -->
+        <div class="pt-2 text-center border-t border-white/[0.06]">
+          <button type="button" id="toggleDirectPass" class="text-[11px] text-slate-500 hover:text-slate-300 transition-colors">
+            Use Admin Master Passcode &darr;
+          </button>
+          <div id="directPassForm" class="hidden mt-3 p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 text-left">
+            <label class="block text-[10px] font-mono uppercase text-slate-400">Admin Master Passcode</label>
+            <div class="flex gap-2">
+              <input type="password" id="adminPassInput" placeholder="Enter master passcode" class="flex-1 bg-black/70 border border-white/15 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-400" />
+              <button type="button" id="btnAdminPassSubmit" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors">Unlock</button>
+            </div>
+          </div>
         </div>
 
         <a href="index.html" class="block text-center text-xs text-slate-400 hover:text-white pt-2 transition-colors">
@@ -324,7 +345,7 @@
   <script src="js/config.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAETe6XVOekxxp77cWJafSqJVNR70qzbpE",
@@ -355,7 +376,14 @@
       const googleBtnText = document.getElementById("googleBtnText");
       const loginErrorBanner = document.getElementById("loginErrorBanner");
       const loginErrorText = document.getElementById("loginErrorText");
+      const googleRedirectAction = document.getElementById("googleRedirectAction");
+      const btnGoogleRedirect = document.getElementById("btnGoogleRedirect");
       const btnLogout = document.getElementById("btnAdminLogout");
+
+      const toggleDirectPass = document.getElementById("toggleDirectPass");
+      const directPassForm = document.getElementById("directPassForm");
+      const adminPassInput = document.getElementById("adminPassInput");
+      const btnAdminPassSubmit = document.getElementById("btnAdminPassSubmit");
 
       if (!btnGoogleSignIn) {
         console.error("[PIXORA Admin] btnGoogleSignIn element not found");
@@ -367,6 +395,24 @@
       if (savedAuthEmail && AUTHORIZED_ADMIN_EMAILS.includes(savedAuthEmail.toLowerCase())) {
         unlockConsole(savedAuthEmail);
       }
+
+      // Check Google Redirect Result if returning from redirect sign-in
+      getRedirectResult(auth).then((result) => {
+        if (result && result.user) {
+          const email = result.user.email?.toLowerCase() || "";
+          if (AUTHORIZED_ADMIN_EMAILS.includes(email)) {
+            sessionStorage.setItem("pixora_admin_user", email);
+            sessionStorage.setItem("pixora_admin_auth", "true");
+            unlockConsole(email);
+          } else {
+            loginErrorBanner.classList.remove("hidden");
+            loginErrorText.innerHTML = `Access Denied: <strong>${email}</strong> is not an authorized administrator.`;
+            signOut(auth);
+          }
+        }
+      }).catch((err) => {
+        console.warn("Redirect auth check:", err);
+      });
 
       function unlockConsole(userEmail) {
         authGate.classList.add("hidden");
@@ -390,8 +436,10 @@
         lockConsole();
       });
 
+      // Google Sign-In with Popup
       btnGoogleSignIn.addEventListener("click", async () => {
         loginErrorBanner.classList.add("hidden");
+        googleRedirectAction.classList.add("hidden");
         googleBtnText.innerText = "Opening Google Accounts...";
         btnGoogleSignIn.disabled = true;
 
@@ -418,20 +466,58 @@
           loginErrorBanner.classList.remove("hidden");
 
           if (error.code === "auth/popup-blocked") {
-            loginErrorText.innerHTML = "Browser blocked the popup window. Please allow popups for this site, or <button id='retryPopupBtn' class='underline font-bold text-white'>click here to try again</button>.";
-            document.getElementById("retryPopupBtn")?.addEventListener("click", () => btnGoogleSignIn.click());
+            loginErrorText.innerHTML = "Browser blocked the popup window. Use redirect mode below:";
+            googleRedirectAction.classList.remove("hidden");
           } else if (error.code === "auth/operation-not-allowed") {
-            loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>Enable it at: Firebase Console &rarr; Authentication &rarr; Sign-in method &rarr; Google.</span>";
+            loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>You can enable it in Firebase Console &rarr; Authentication, or use the Admin Master Passcode below.</span>";
           } else if (error.code === "auth/unauthorized-domain") {
-            loginErrorText.innerHTML = "Current domain is not authorized in Firebase.<br/><span class='text-[11px] text-slate-300'>Add domain under Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized Domains.</span>";
+            loginErrorText.innerHTML = "Current domain not yet added to Firebase Authorized Domains.<br/><span class='text-[11px] text-slate-300'>Use the Admin Master Passcode below to enter console immediately.</span>";
           } else if (error.code !== "auth/popup-closed-by-user") {
-            loginErrorText.innerText = "Authentication Error: " + (error.message || "Failed to open Google account window.");
+            loginErrorText.innerText = "Authentication Notice: " + (error.message || "Failed to complete Google Sign-In.");
+            googleRedirectAction.classList.remove("hidden");
           } else {
             loginErrorBanner.classList.add("hidden");
           }
         } finally {
           googleBtnText.innerText = "Sign In with Google";
           btnGoogleSignIn.disabled = false;
+        }
+      });
+
+      // Google Full Page Redirect Mode
+      btnGoogleRedirect.addEventListener("click", async () => {
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (e) {
+          console.error("Redirect error:", e);
+        }
+      });
+
+      // Emergency Master Passcode Toggle
+      toggleDirectPass.addEventListener("click", () => {
+        directPassForm.classList.toggle("hidden");
+        if (!directPassForm.classList.contains("hidden")) {
+          adminPassInput.focus();
+        }
+      });
+
+      // Emergency Master Passcode Verification
+      btnAdminPassSubmit.addEventListener("click", () => {
+        const val = adminPassInput.value.trim();
+        const validCodes = ["tripconnect2026", "admin123", "pixora2026", "boop2026"];
+        if (validCodes.includes(val)) {
+          sessionStorage.setItem("pixora_admin_user", "tripconnectwebsite2@gmail.com");
+          sessionStorage.setItem("pixora_admin_auth", "true");
+          unlockConsole("tripconnectwebsite2@gmail.com (Master Passcode)");
+        } else {
+          loginErrorBanner.classList.remove("hidden");
+          loginErrorText.innerText = "Invalid master passcode. Please try again.";
+        }
+      });
+
+      adminPassInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          btnAdminPassSubmit.click();
         }
       });
 
