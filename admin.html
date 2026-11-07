@@ -85,20 +85,6 @@
           </div>
         </div>
 
-        <!-- Emergency Admin Access Option -->
-        <div class="pt-2 text-center border-t border-white/[0.06]">
-          <button type="button" id="toggleDirectPass" class="text-[11px] text-slate-500 hover:text-slate-300 transition-colors">
-            Use Admin Master Passcode &darr;
-          </button>
-          <div id="directPassForm" class="hidden mt-3 p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 text-left">
-            <label class="block text-[10px] font-mono uppercase text-slate-400">Admin Master Passcode</label>
-            <div class="flex gap-2">
-              <input type="password" id="adminPassInput" placeholder="Enter master passcode" class="flex-1 bg-black/70 border border-white/15 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-400" />
-              <button type="button" id="btnAdminPassSubmit" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors">Unlock</button>
-            </div>
-          </div>
-        </div>
-
         <a href="index.html" class="block text-center text-xs text-slate-400 hover:text-white pt-2 transition-colors">
           &larr; Back to Public Website
         </a>
@@ -380,11 +366,6 @@
       const btnGoogleRedirect = document.getElementById("btnGoogleRedirect");
       const btnLogout = document.getElementById("btnAdminLogout");
 
-      const toggleDirectPass = document.getElementById("toggleDirectPass");
-      const directPassForm = document.getElementById("directPassForm");
-      const adminPassInput = document.getElementById("adminPassInput");
-      const btnAdminPassSubmit = document.getElementById("btnAdminPassSubmit");
-
       if (!btnGoogleSignIn) {
         console.error("[PIXORA Admin] btnGoogleSignIn element not found");
         return;
@@ -469,13 +450,10 @@
             loginErrorText.innerHTML = "Browser blocked the popup window. Use redirect mode below:";
             googleRedirectAction.classList.remove("hidden");
           } else if (error.code === "auth/operation-not-allowed") {
-            loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>You can enable it in Firebase Console &rarr; Authentication, or use the Admin Master Passcode below.</span>";
+            loginErrorText.innerHTML = "Google Sign-in is not enabled in Firebase Console yet.<br/><span class='text-[11px] text-slate-300'>Enable it in Firebase Console &rarr; Authentication &rarr; Sign-in method &rarr; Google.</span>";
           } else if (error.code === "auth/unauthorized-domain") {
             const currentHost = window.location.hostname || "your domain";
-            loginErrorText.innerHTML = `Domain <strong>${currentHost}</strong> is not yet added in Firebase.<br/><span class='text-[11px] text-slate-300'>Add <strong>${currentHost}</strong> in Firebase Console &rarr; Auth &rarr; Settings &rarr; Authorized domains.<br/>Or enter Admin Passcode below to unlock now:</span>`;
-            // Auto open passcode form for convenience
-            directPassForm.classList.remove("hidden");
-            adminPassInput.focus();
+            loginErrorText.innerHTML = `Domain <strong>${currentHost}</strong> is not authorized in Firebase.<br/><span class='text-[11px] text-slate-300'>Add <strong>${currentHost}</strong> in Firebase Console &rarr; Auth &rarr; Settings &rarr; Authorized domains.</span>`;
           } else if (error.code !== "auth/popup-closed-by-user") {
             loginErrorText.innerText = "Authentication Notice: " + (error.message || "Failed to complete Google Sign-In.");
             googleRedirectAction.classList.remove("hidden");
@@ -494,34 +472,6 @@
           await signInWithRedirect(auth, provider);
         } catch (e) {
           console.error("Redirect error:", e);
-        }
-      });
-
-      // Emergency Master Passcode Toggle
-      toggleDirectPass.addEventListener("click", () => {
-        directPassForm.classList.toggle("hidden");
-        if (!directPassForm.classList.contains("hidden")) {
-          adminPassInput.focus();
-        }
-      });
-
-      // Emergency Master Passcode Verification
-      btnAdminPassSubmit.addEventListener("click", () => {
-        const val = adminPassInput.value.trim();
-        const validCodes = ["tripconnect2026", "admin123", "pixora2026", "boop2026"];
-        if (validCodes.includes(val)) {
-          sessionStorage.setItem("pixora_admin_user", "tripconnectwebsite2@gmail.com");
-          sessionStorage.setItem("pixora_admin_auth", "true");
-          unlockConsole("tripconnectwebsite2@gmail.com (Master Passcode)");
-        } else {
-          loginErrorBanner.classList.remove("hidden");
-          loginErrorText.innerText = "Invalid master passcode. Please try again.";
-        }
-      });
-
-      adminPassInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          btnAdminPassSubmit.click();
         }
       });
 
