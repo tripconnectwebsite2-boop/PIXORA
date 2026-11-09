@@ -36,6 +36,8 @@ class PhotoCullerApp {
     // VIP Person Finder Elements
     this.personInput = document.getElementById("personInput");
     this.btnSelectPerson = document.getElementById("btnSelectPerson");
+    this.btnTrySampleGroupFace = document.getElementById("btnTrySampleGroupFace");
+    this.btnLoadDemoSamples = document.getElementById("btnLoadDemoSamples");
     this.personActiveCard = document.getElementById("personActiveCard");
     this.personAvatarImg = document.getElementById("personAvatarImg");
     this.personMatchCountText = document.getElementById("personMatchCountText");
@@ -172,6 +174,14 @@ class PhotoCullerApp {
           this.handleReferencePersonUpload(e.target.files[0]);
         }
       });
+    }
+
+    if (this.btnTrySampleGroupFace) {
+      this.btnTrySampleGroupFace.addEventListener("click", () => this.loadSampleGroupForFacePicker());
+    }
+
+    if (this.btnLoadDemoSamples) {
+      this.btnLoadDemoSamples.addEventListener("click", () => this.loadSamplePhotos());
     }
 
     if (this.btnFilterMatchedOnly) {
@@ -959,6 +969,58 @@ class PhotoCullerApp {
     } else {
       this.personActiveCard.classList.add("hidden");
       this.filterMatchedPersonOnly = false;
+    }
+  }
+
+  async loadSamplePhotos() {
+    try {
+      this.showToast("Loading sample wedding captures & family group...", "info");
+      const samplePaths = [
+        { path: "sample_wedding_photos/family_group_sample.jpg", name: "Family_Group_Portrait.jpg" },
+        { path: "sample_wedding_photos/wedding_portrait_sharp_keeper.jpg", name: "Bride_Groom_Sharp_Keeper.jpg" },
+        { path: "sample_wedding_photos/couple_burst_shot_A.jpg", name: "Couple_Burst_01.jpg" },
+        { path: "sample_wedding_photos/couple_burst_shot_B.jpg", name: "Couple_Burst_02.jpg" },
+        { path: "sample_wedding_photos/wedding_out_of_focus_dance.jpg", name: "Dance_Floor_Blur.jpg" },
+        { path: "sample_wedding_photos/night_reception_too_dark.jpg", name: "Reception_Low_Light.jpg" }
+      ];
+
+      const files = [];
+      for (const item of samplePaths) {
+        try {
+          const res = await fetch(item.path);
+          if (res.ok) {
+            const blob = await res.blob();
+            const file = new File([blob], item.name, { type: "image/jpeg" });
+            files.push(file);
+          }
+        } catch (e) {
+          console.warn("Could not fetch sample:", item.path, e);
+        }
+      }
+
+      if (files.length > 0) {
+        await this.handleFiles(files);
+        this.showToast(`Loaded ${files.length} sample captures for testing.`, "success");
+      } else {
+        this.showToast("Could not load sample photos from server.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      this.showToast("Error loading demo samples.", "error");
+    }
+  }
+
+  async loadSampleGroupForFacePicker() {
+    try {
+      this.showToast("Scanning 5-person family group portrait...", "info");
+      const res = await fetch("sample_wedding_photos/family_group_sample.jpg");
+      if (!res.ok) throw new Error("Sample file not found");
+      const blob = await res.blob();
+      const file = new File([blob], "Family_Group_Portrait.jpg", { type: "image/jpeg" });
+      await this.handleReferencePersonUpload(file);
+    } catch (err) {
+      console.error(err);
+      this.showToast("Could not load sample family photo: " + err.message, "error");
     }
   }
 
