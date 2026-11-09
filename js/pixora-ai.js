@@ -56,9 +56,9 @@ class PixoraNeuralEngine {
           },
           runningMode: "IMAGE",
           numFaces: 64,
-          minFaceDetectionConfidence: 0.15,
-          minFacePresenceConfidence: 0.15,
-          minTrackingConfidence: 0.15
+          minFaceDetectionConfidence: 0.10,
+          minFacePresenceConfidence: 0.10,
+          minTrackingConfidence: 0.10
         });
       } catch (gpuErr) {
         console.warn("[PIXORA] GPU delegate unavailable, activating CPU neural delegate:", gpuErr);
@@ -69,9 +69,9 @@ class PixoraNeuralEngine {
           },
           runningMode: "IMAGE",
           numFaces: 64,
-          minFaceDetectionConfidence: 0.15,
-          minFacePresenceConfidence: 0.15,
-          minTrackingConfidence: 0.15
+          minFaceDetectionConfidence: 0.10,
+          minFacePresenceConfidence: 0.10,
+          minTrackingConfidence: 0.10
         });
       }
 
@@ -319,76 +319,6 @@ class PixoraNeuralEngine {
   }
 
   /**
-   * Detects ALL faces in a reference photo and returns bounding boxes, crops, and signatures
-   * for the interactive square box selector.
-   */
-  async detectAllFacesInReferencePhoto(file) {
-    const { img, url } = await this.loadImage(file);
-    if (!this.faceLandmarker || !this.isNeuralReady) {
-      throw new Error("Neural landmarker not ready yet.");
-    }
-
-    const results = this.faceLandmarker.detect(img);
-    if (!results || !results.faceLandmarks || results.faceLandmarks.length === 0) {
-      throw new Error("No clear face detected in the reference photo. Please choose a photo with a visible face.");
-    }
-
-    const detectedList = [];
-
-    for (let i = 0; i < results.faceLandmarks.length; i++) {
-      const landmarks = results.faceLandmarks[i];
-      let minX = 1, minY = 1, maxX = 0, maxY = 0;
-      for (const pt of landmarks) {
-        if (pt.x < minX) minX = pt.x;
-        if (pt.y < minY) minY = pt.y;
-        if (pt.x > maxX) maxX = pt.x;
-        if (pt.y > maxY) maxY = pt.y;
-      }
-
-      const padW = (maxX - minX) * 0.25;
-      const padH = (maxY - minY) * 0.35;
-      const cropX = Math.max(0, (minX - padW) * img.width);
-      const cropY = Math.max(0, (minY - padH) * img.height);
-      const cropW = Math.min(img.width - cropX, (maxX - minX + padW * 2) * img.width);
-      const cropH = Math.min(img.height - cropY, (maxY - minY + padH * 2) * img.height);
-
-      let cropUrl = "";
-      try {
-        const c = document.createElement("canvas");
-        c.width = 140;
-        c.height = 140;
-        const ctx = c.getContext("2d");
-        ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, 140, 140);
-        cropUrl = c.toDataURL("image/jpeg", 0.9);
-      } catch (e) {
-        cropUrl = url;
-      }
-
-      const signature = this.extractFaceSignatureFromLandmarks(landmarks);
-      if (signature) {
-        detectedList.push({
-          index: i + 1,
-          box: {
-            leftPercent: (minX * 100).toFixed(1),
-            topPercent: (minY * 100).toFixed(1),
-            widthPercent: ((maxX - minX) * 100).toFixed(1),
-            heightPercent: ((maxY - minY) * 100).toFixed(1)
-          },
-          cropUrl,
-          signature
-        });
-      }
-    }
-
-    return {
-      imgUrl: url,
-      imgWidth: img.width,
-      imgHeight: img.height,
-      faces: detectedList
-    };
-  }
-
-  /**
    * Applies the selected face signature from the interactive picker
    */
   applyReferenceSignature(signature, avatarUrl) {
@@ -439,7 +369,20 @@ class PixoraNeuralEngine {
       throw new Error("Neural face detector is initializing. Please wait a moment.");
     }
 
-    const results = this.faceLandmarker.detect(img);
+    // Optimize inference element: if image is massive (>2560px), resize onto smooth canvas for faster, stable landmarking
+    let inferenceSource = img;
+    const maxDim = Math.max(img.width, img.height);
+    if (maxDim > 2560) {
+      const scale = 2560 / maxDim;
+      const cvs = document.createElement("canvas");
+      cvs.width = Math.round(img.width * scale);
+      cvs.height = Math.round(img.height * scale);
+      const ctx = cvs.getContext("2d");
+      ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+      inferenceSource = cvs;
+    }
+
+    const results = this.faceLandmarker.detect(inferenceSource);
     if (!results || !results.faceLandmarks || results.faceLandmarks.length === 0) {
       throw new Error("No face detected in reference photo. Please choose a photo with at least one visible face.");
     }
@@ -457,8 +400,8 @@ class PixoraNeuralEngine {
       
       const boxW = maxX - minX;
       const boxH = maxY - minY;
-      // Skip tiny distant artifacts (<2.5% frame height)
-      if (boxH < 0.025) continue;
+      // Skip only sub-pixel tiny specks (<1.2% frame height)
+      if (boxH < 0.012) continue;
 
       const signature = this.extractFaceSignatureFromLandmarks(lms);
       if (!signature) continue;
@@ -684,10 +627,11 @@ class PixoraNeuralEngine {
     }
     const l2 = Math.sqrt(sumSq);
 
-    // True match criteria: L2 <= 0.20 and max individual ratio difference <= 0.25
-    const isMatch = l2 <= 0.20 && maxRelDiff <= 0.25;
+    // Balanced biometric match criteria: L2 <= 0.28 and max component deviation <= 0.40
+    // Accommodates wedding smile, slight head angle, and variable lighting while rejecting strangers
+    const isMatch = l2 <= 0.28 && maxRelDiff <= 0.40;
     const confidence = isMatch
-      ? Math.min(99.8, Math.max(85.0, Math.round((1 - (l2 / 0.20)) * 14.8 + 85.0)))
+      ? Math.min(99.8, Math.max(82.0, Math.round((1 - (l2 / 0.28)) * 17.8 + 82.0)))
       : 0;
 
     return { isMatch, l2, confidence };
@@ -706,14 +650,14 @@ class PixoraNeuralEngine {
     let bestMatch = { isMatch: false, l2: 999, confidence: 0 };
 
     for (const landmarks of detectedLandmarksList) {
-      // Ignore tiny background specks smaller than 20px (height < 0.038 of frame)
+      // Retain all clear faces (height >= 1.5% of frame)
       let minY = 1, maxY = 0;
       for (const pt of landmarks) {
         if (pt.y < minY) minY = pt.y;
         if (pt.y > maxY) maxY = pt.y;
       }
       const faceHeight = maxY - minY;
-      if (faceHeight < 0.038) continue; // Skip distant crowd speck
+      if (faceHeight < 0.015) continue; // Skip only sub-pixel background specks
 
       const sig = this.extractFaceSignatureFromLandmarks(landmarks);
       if (sig) {

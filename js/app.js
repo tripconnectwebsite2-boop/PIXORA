@@ -871,10 +871,14 @@ class PhotoCullerApp {
 
     // Recheck album captures against this locked target face
     const matchCount = window.CullingEngine.recheckCapturesForPerson(this.photos);
+    // Automatically filter to show only this person's photos
+    if (matchCount > 0) {
+      this.filterMatchedPersonOnly = true;
+    }
     this.updatePersonFinderUI(matchCount);
     this.renderGrid();
 
-    this.showToast(`Target person locked! Found in ${matchCount} album capture${matchCount === 1 ? '' : 's'}.`, "success");
+    this.showToast(`Person locked! Filtered ${matchCount} capture${matchCount === 1 ? '' : 's'}.`, "success");
   }
 
   showToast(message, type = "info") {
