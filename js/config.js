@@ -191,13 +191,12 @@ class PixoraConfig {
                 <span>${config.maintenance.message || "Scheduled system maintenance in progress. Services will resume shortly."}</span>
               </div>
             </div>
-            <a href="admin.html" class="hidden sm:inline-block px-3 py-1 rounded bg-black/30 hover:bg-black/50 text-amber-200 text-xs font-mono transition-colors">Admin Console</a>
           </div>
         </div>
       `;
     }
 
-    // 2. Custom Visitor Broadcast Announcement Banner
+    // 2. Custom Visitor Broadcast Announcement Banner (Auto-dismisses in 15 seconds)
     if (config.announcement && config.announcement.active && config.announcement.text) {
       const type = config.announcement.type || "info";
       let bgClasses = "from-indigo-600 via-violet-600 to-indigo-700 border-indigo-400/30";
@@ -215,18 +214,28 @@ class PixoraConfig {
       }
 
       html += `
-        <div id="pixoraBroadcastItem" class="bg-gradient-to-r ${bgClasses} text-white px-4 py-2.5 shadow-md border-b flex items-center justify-between text-xs font-medium animate-fade-in">
+        <div id="pixoraBroadcastItem" class="bg-gradient-to-r ${bgClasses} text-white px-4 py-2.5 shadow-md border-b flex items-center justify-between text-xs font-medium animate-fade-in transition-all duration-500">
           <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
               <span class="w-2 h-2 rounded-full ${dotClass} animate-pulse"></span>
               <span>${config.announcement.text}</span>
             </div>
-            <button type="button" onclick="document.getElementById('pixoraBroadcastItem').style.display='none'" class="text-white/80 hover:text-white px-2 py-0.5 rounded hover:bg-white/10 transition-colors text-xs flex items-center gap-1 font-mono">
-              Dismiss &times;
-            </button>
           </div>
         </div>
       `;
+
+      // Auto-hide announcement after exactly 15 seconds
+      if (this.announcementTimer) {
+        clearTimeout(this.announcementTimer);
+      }
+      this.announcementTimer = setTimeout(() => {
+        const item = document.getElementById("pixoraBroadcastItem");
+        if (item) {
+          item.style.opacity = "0";
+          item.style.transform = "translateY(-100%)";
+          setTimeout(() => item.remove(), 500);
+        }
+      }, 15000);
     }
 
     bannerContainer.innerHTML = html;

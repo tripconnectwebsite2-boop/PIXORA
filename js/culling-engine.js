@@ -344,6 +344,56 @@ class CullingEngine {
 
     return list;
   }
+
+  // --- VIP PERSON FINDER DELEGATION TO NEURAL AI ENGINE ---
+  async detectAllFacesInReferencePhoto(file) {
+    if (window.PixoraAI && window.PixoraAI.detectAllFacesInReferencePhoto) {
+      return await window.PixoraAI.detectAllFacesInReferencePhoto(file);
+    }
+    if (window.PixoraNeuralEngine && window.PixoraNeuralEngine.detectAllFacesInReferencePhoto) {
+      return await window.PixoraNeuralEngine.detectAllFacesInReferencePhoto(file);
+    }
+    throw new Error("Neural face recognition engine is initializing. Please wait a moment.");
+  }
+
+  applyReferenceSignature(signature, avatarUrl) {
+    if (window.PixoraAI && window.PixoraAI.applyReferenceSignature) {
+      return window.PixoraAI.applyReferenceSignature(signature, avatarUrl);
+    }
+    if (window.PixoraNeuralEngine && window.PixoraNeuralEngine.applyReferenceSignature) {
+      return window.PixoraNeuralEngine.applyReferenceSignature(signature, avatarUrl);
+    }
+    return { success: true };
+  }
+
+  hasReferenceFace() {
+    if (window.PixoraAI && window.PixoraAI.hasReferenceFace) {
+      return window.PixoraAI.hasReferenceFace();
+    }
+    if (window.PixoraNeuralEngine && window.PixoraNeuralEngine.hasReferenceFace) {
+      return window.PixoraNeuralEngine.hasReferenceFace();
+    }
+    return false;
+  }
+
+  clearReferenceFace(personNum = 1) {
+    if (window.PixoraAI && window.PixoraAI.clearReferenceFace) {
+      window.PixoraAI.clearReferenceFace(personNum);
+    }
+    if (window.PixoraNeuralEngine && window.PixoraNeuralEngine.clearReferenceFace) {
+      window.PixoraNeuralEngine.clearReferenceFace(personNum);
+    }
+  }
+
+  recheckCapturesForPerson(photos) {
+    if (window.PixoraAI && window.PixoraAI.recheckCapturesForPerson) {
+      return window.PixoraAI.recheckCapturesForPerson(photos);
+    }
+    if (window.PixoraNeuralEngine && window.PixoraNeuralEngine.recheckCapturesForPerson) {
+      return window.PixoraNeuralEngine.recheckCapturesForPerson(photos);
+    }
+    return 0;
+  }
 }
 
 window.CullingEngine = new CullingEngine();
