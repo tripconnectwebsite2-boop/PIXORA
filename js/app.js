@@ -36,8 +36,6 @@ class PhotoCullerApp {
     // VIP Person Finder Elements
     this.personInput = document.getElementById("personInput");
     this.btnSelectPerson = document.getElementById("btnSelectPerson");
-    this.btnTrySampleGroupFace = document.getElementById("btnTrySampleGroupFace");
-    this.btnLoadDemoSamples = document.getElementById("btnLoadDemoSamples");
     this.personActiveCard = document.getElementById("personActiveCard");
     this.personAvatarImg = document.getElementById("personAvatarImg");
     this.personMatchCountText = document.getElementById("personMatchCountText");
@@ -176,14 +174,6 @@ class PhotoCullerApp {
       });
     }
 
-    if (this.btnTrySampleGroupFace) {
-      this.btnTrySampleGroupFace.addEventListener("click", () => this.loadSampleGroupForFacePicker());
-    }
-
-    if (this.btnLoadDemoSamples) {
-      this.btnLoadDemoSamples.addEventListener("click", () => this.loadSamplePhotos());
-    }
-
     if (this.btnFilterMatchedOnly) {
       this.btnFilterMatchedOnly.addEventListener("click", () => {
         this.filterMatchedPersonOnly = !this.filterMatchedPersonOnly;
@@ -255,9 +245,14 @@ class PhotoCullerApp {
   initCameraImportHandlers() {
     this.btnCameraConnect = document.getElementById("btnCameraConnect");
     this.cameraPermissionModal = document.getElementById("cameraPermissionModal");
-    this.btnGrantCameraPermission = document.getElementById("btnGrantCameraPermission");
     this.btnCancelCameraPermission = document.getElementById("btnCancelCameraPermission");
     this.cameraInput = document.getElementById("cameraInput");
+    this.connectedDeviceBanner = document.getElementById("connectedDeviceBanner");
+    this.connectedDeviceTitle = document.getElementById("connectedDeviceTitle");
+    this.connectedDeviceStats = document.getElementById("connectedDeviceStats");
+    this.btnDisconnectDevice = document.getElementById("btnDisconnectDevice");
+    this.btnScanWebUsb = document.getElementById("btnScanWebUsb");
+    this.activeConnectedDevice = null;
 
     if (this.btnCameraConnect) {
       this.btnCameraConnect.addEventListener("click", () => {
@@ -275,12 +270,46 @@ class PhotoCullerApp {
       });
     }
 
-    if (this.btnGrantCameraPermission) {
-      this.btnGrantCameraPermission.addEventListener("click", async () => {
+    // Interactive Device Selection Buttons (Camera, Mobile, USB Flash)
+    const deviceButtons = document.querySelectorAll(".device-select-btn");
+    deviceButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const deviceType = btn.dataset.deviceType || "camera";
         if (this.cameraPermissionModal) {
           this.cameraPermissionModal.classList.add("hidden");
         }
-        await this.requestCameraStorageAccess();
+        await this.connectSpecificDevice(deviceType);
+      });
+    });
+
+    // Disconnect / Switch Device
+    if (this.btnDisconnectDevice) {
+      this.btnDisconnectDevice.addEventListener("click", () => {
+        this.activeConnectedDevice = null;
+        if (this.connectedDeviceBanner) {
+          this.connectedDeviceBanner.classList.add("hidden");
+        }
+        this.showToast("Device disconnected. Click 'Connect Camera' to choose another.", "info");
+      });
+    }
+
+    // Direct WebUSB Hardware Pairing
+    if (this.btnScanWebUsb) {
+      this.btnScanWebUsb.addEventListener("click", async () => {
+        if (navigator.usb) {
+          try {
+            this.showToast("Requesting direct USB hardware pairing...", "info");
+            const usbDev = await navigator.usb.requestDevice({ filters: [] });
+            this.showToast(`Paired USB Hardware: ${usbDev.productName || "Mass Storage Device"}`, "success");
+            await this.connectSpecificDevice("camera");
+          } catch (e) {
+            console.warn("WebUSB request cancelled or not permitted:", e);
+            await this.connectSpecificDevice("camera");
+          }
+        } else {
+          this.showToast("Direct WebUSB not supported in this browser. Opening device storage...", "info");
+          await this.connectSpecificDevice("camera");
+        }
       });
     }
 
@@ -293,12 +322,19 @@ class PhotoCullerApp {
     }
   }
 
-  async requestCameraStorageAccess() {
+  async connectSpecificDevice(type) {
+    const deviceLabels = {
+      camera: "DSLR / Mirrorless Camera (SD Card)",
+      mobile: "Mobile Phone (USB MTP / Camera Roll)",
+      usb_drive: "Removable USB Flash / Card Reader"
+    };
+    const deviceName = deviceLabels[type] || "Connected Device";
+
     try {
       if (window.showDirectoryPicker) {
-        this.showToast("Opening DCIM / Camera Storage picker...", "info");
+        this.showToast(`Select the folder on your ${deviceName}...`, "info");
         const dirHandle = await window.showDirectoryPicker({
-          id: "camera-dcim",
+          id: `pixora-device-${type}`,
           mode: "read",
           startIn: "removable"
         });
@@ -309,6 +345,7 @@ class PhotoCullerApp {
             if (entry.kind === "file") {
               const file = await entry.getFile();
               if (file.type.startsWith("image/") || /\.(arw|cr2|cr3|nef|dng|heic|tif|tiff|jpg|jpeg|png|webp)$/i.test(file.name)) {
+                file.deviceSource = type;
                 files.push(file);
               }
             } else if (entry.kind === "directory") {
@@ -320,10 +357,16 @@ class PhotoCullerApp {
         await scanDir(dirHandle);
 
         if (files.length > 0) {
-          this.showToast(`Found ${files.length} camera/mobile captures! Starting analysis...`, "success");
-          this.handleFiles(files);
+          this.activeConnectedDevice = { type, name: deviceName, count: files.length };
+          if (this.connectedDeviceBanner) {
+            this.connectedDeviceTitle.innerText = `Connected: ${deviceName}`;
+            this.connectedDeviceStats.innerText = `Imported ${files.length} captures exclusively from this device volume`;
+            this.connectedDeviceBanner.classList.remove("hidden");
+          }
+          this.showToast(`Imported ${files.length} captures from ${deviceName}!`, "success");
+          await this.handleFiles(files);
         } else {
-          this.showToast("No photos found in selected directory. Please choose the DCIM folder.", "warning");
+          this.showToast(`No photo captures found on this device volume. Please check the DCIM folder.`, "warning");
         }
       } else {
         if (this.cameraInput) {
@@ -334,8 +377,8 @@ class PhotoCullerApp {
       }
     } catch (err) {
       if (err.name !== "AbortError") {
-        this.showToast("Storage access notice: " + (err.message || "Manual selection"), "info");
-        if (this.cameraInput) this.cameraInput.click();
+        console.error("Device connection error:", err);
+        this.showToast(`Could not read device: ${err.message}`, "error");
       }
     }
   }
@@ -969,58 +1012,6 @@ class PhotoCullerApp {
     } else {
       this.personActiveCard.classList.add("hidden");
       this.filterMatchedPersonOnly = false;
-    }
-  }
-
-  async loadSamplePhotos() {
-    try {
-      this.showToast("Loading sample wedding captures & family group...", "info");
-      const samplePaths = [
-        { path: "sample_wedding_photos/family_group_sample.jpg", name: "Family_Group_Portrait.jpg" },
-        { path: "sample_wedding_photos/wedding_portrait_sharp_keeper.jpg", name: "Bride_Groom_Sharp_Keeper.jpg" },
-        { path: "sample_wedding_photos/couple_burst_shot_A.jpg", name: "Couple_Burst_01.jpg" },
-        { path: "sample_wedding_photos/couple_burst_shot_B.jpg", name: "Couple_Burst_02.jpg" },
-        { path: "sample_wedding_photos/wedding_out_of_focus_dance.jpg", name: "Dance_Floor_Blur.jpg" },
-        { path: "sample_wedding_photos/night_reception_too_dark.jpg", name: "Reception_Low_Light.jpg" }
-      ];
-
-      const files = [];
-      for (const item of samplePaths) {
-        try {
-          const res = await fetch(item.path);
-          if (res.ok) {
-            const blob = await res.blob();
-            const file = new File([blob], item.name, { type: "image/jpeg" });
-            files.push(file);
-          }
-        } catch (e) {
-          console.warn("Could not fetch sample:", item.path, e);
-        }
-      }
-
-      if (files.length > 0) {
-        await this.handleFiles(files);
-        this.showToast(`Loaded ${files.length} sample captures for testing.`, "success");
-      } else {
-        this.showToast("Could not load sample photos from server.", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      this.showToast("Error loading demo samples.", "error");
-    }
-  }
-
-  async loadSampleGroupForFacePicker() {
-    try {
-      this.showToast("Scanning 5-person family group portrait...", "info");
-      const res = await fetch("sample_wedding_photos/family_group_sample.jpg");
-      if (!res.ok) throw new Error("Sample file not found");
-      const blob = await res.blob();
-      const file = new File([blob], "Family_Group_Portrait.jpg", { type: "image/jpeg" });
-      await this.handleReferencePersonUpload(file);
-    } catch (err) {
-      console.error(err);
-      this.showToast("Could not load sample family photo: " + err.message, "error");
     }
   }
 
