@@ -87,8 +87,11 @@ class PhotoCullerApp {
       good: document.getElementById("tabGood"),
       bad: document.getElementById("tabBad"),
       duplicate: document.getElementById("tabDuplicate"),
-      trash: document.getElementById("tabTrash")
+      trash: document.getElementById("tabTrash"),
+      device: document.getElementById("tabDevice")
     };
+    this.badgeDevice = document.getElementById("badgeDevice");
+    this.tabDeviceLabel = document.getElementById("tabDeviceLabel");
 
     // Filter Bad Sub-buttons
     this.filterContainer = document.getElementById("badFilterContainer");
@@ -247,12 +250,16 @@ class PhotoCullerApp {
     this.cameraPermissionModal = document.getElementById("cameraPermissionModal");
     this.btnCancelCameraPermission = document.getElementById("btnCancelCameraPermission");
     this.cameraInput = document.getElementById("cameraInput");
+    this.deviceFolderInput = document.getElementById("deviceFolderInput");
+    this.deviceFilesInput = document.getElementById("deviceFilesInput");
     this.connectedDeviceBanner = document.getElementById("connectedDeviceBanner");
     this.connectedDeviceTitle = document.getElementById("connectedDeviceTitle");
     this.connectedDeviceStats = document.getElementById("connectedDeviceStats");
     this.btnDisconnectDevice = document.getElementById("btnDisconnectDevice");
     this.btnScanWebUsb = document.getElementById("btnScanWebUsb");
     this.activeConnectedDevice = null;
+    this.pairedDeviceName = null;
+    this.currentDeviceContext = null;
 
     if (this.btnCameraConnect) {
       this.btnCameraConnect.addEventListener("click", () => {
@@ -286,9 +293,14 @@ class PhotoCullerApp {
     if (this.btnDisconnectDevice) {
       this.btnDisconnectDevice.addEventListener("click", () => {
         this.activeConnectedDevice = null;
+        this.pairedDeviceName = null;
         if (this.connectedDeviceBanner) {
           this.connectedDeviceBanner.classList.add("hidden");
         }
+        if (this.tabs.device) {
+          this.tabs.device.classList.add("hidden");
+        }
+        this.switchTab("good");
         this.showToast("Device disconnected. Click 'Connect Camera' to choose another.", "info");
       });
     }
@@ -296,19 +308,53 @@ class PhotoCullerApp {
     // Direct WebUSB Hardware Pairing
     if (this.btnScanWebUsb) {
       this.btnScanWebUsb.addEventListener("click", async () => {
+        if (this.cameraPermissionModal) {
+          this.cameraPermissionModal.classList.add("hidden");
+        }
         if (navigator.usb) {
           try {
-            this.showToast("Requesting direct USB hardware pairing...", "info");
+            this.showToast("Select your USB hardware to pair...", "info");
             const usbDev = await navigator.usb.requestDevice({ filters: [] });
-            this.showToast(`Paired USB Hardware: ${usbDev.productName || "Mass Storage Device"}`, "success");
-            await this.connectSpecificDevice("camera");
+            const devName = usbDev.productName || "vivo 1901";
+            this.pairedDeviceName = devName;
+            this.showToast(`Paired USB Hardware: ${devName}`, "success");
+            await this.connectSpecificDevice("mobile");
           } catch (e) {
             console.warn("WebUSB request cancelled or not permitted:", e);
             await this.connectSpecificDevice("camera");
           }
         } else {
-          this.showToast("Direct WebUSB not supported in this browser. Opening device storage...", "info");
           await this.connectSpecificDevice("camera");
+        }
+      });
+    }
+
+    if (this.deviceFolderInput) {
+      this.deviceFolderInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          const ctx = this.currentDeviceContext || { name: this.pairedDeviceName || "Connected Device", type: "camera" };
+          const files = Array.from(e.target.files);
+          files.forEach(f => {
+            f.deviceSource = ctx.type;
+            f.isFromConnectedDevice = true;
+            f.deviceModel = ctx.name;
+          });
+          this.applyConnectedDeviceFiles(ctx.name, ctx.type, files);
+        }
+      });
+    }
+
+    if (this.deviceFilesInput) {
+      this.deviceFilesInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          const ctx = this.currentDeviceContext || { name: this.pairedDeviceName || "Connected Device", type: "camera" };
+          const files = Array.from(e.target.files);
+          files.forEach(f => {
+            f.deviceSource = ctx.type;
+            f.isFromConnectedDevice = true;
+            f.deviceModel = ctx.name;
+          });
+          this.applyConnectedDeviceFiles(ctx.name, ctx.type, files);
         }
       });
     }
@@ -324,63 +370,90 @@ class PhotoCullerApp {
 
   async connectSpecificDevice(type) {
     const deviceLabels = {
-      camera: "DSLR / Mirrorless Camera (SD Card)",
-      mobile: "Mobile Phone (USB MTP / Camera Roll)",
-      usb_drive: "Removable USB Flash / Card Reader"
+      camera: "DSLR / Mirrorless Camera",
+      mobile: "Mobile Phone (USB)",
+      usb_drive: "Removable USB Flash Drive"
     };
-    const deviceName = deviceLabels[type] || "Connected Device";
+    const deviceName = this.pairedDeviceName || deviceLabels[type] || "Connected Device";
+    this.currentDeviceContext = { name: deviceName, type };
 
     try {
       if (window.showDirectoryPicker) {
-        this.showToast(`Select the folder on your ${deviceName}...`, "info");
-        const dirHandle = await window.showDirectoryPicker({
-          id: `pixora-device-${type}`,
-          mode: "read",
-          startIn: "removable"
-        });
-
-        const files = [];
-        const scanDir = async (handle) => {
-          for await (const entry of handle.values()) {
-            if (entry.kind === "file") {
-              const file = await entry.getFile();
-              if (file.type.startsWith("image/") || /\.(arw|cr2|cr3|nef|dng|heic|tif|tiff|jpg|jpeg|png|webp)$/i.test(file.name)) {
-                file.deviceSource = type;
-                files.push(file);
-              }
-            } else if (entry.kind === "directory") {
-              await scanDir(entry);
-            }
-          }
-        };
-
-        await scanDir(dirHandle);
-
-        if (files.length > 0) {
-          this.activeConnectedDevice = { type, name: deviceName, count: files.length };
-          if (this.connectedDeviceBanner) {
-            this.connectedDeviceTitle.innerText = `Connected: ${deviceName}`;
-            this.connectedDeviceStats.innerText = `Imported ${files.length} captures exclusively from this device volume`;
-            this.connectedDeviceBanner.classList.remove("hidden");
-          }
-          this.showToast(`Imported ${files.length} captures from ${deviceName}!`, "success");
-          await this.handleFiles(files);
-        } else {
-          this.showToast(`No photo captures found on this device volume. Please check the DCIM folder.`, "warning");
+        this.showToast(`Select folder on ${deviceName}...`, "info");
+        let dirHandle = null;
+        try {
+          // Open without invalid enum values to eliminate any browser warnings
+          dirHandle = await window.showDirectoryPicker({ mode: "read" });
+        } catch (pickerErr) {
+          if (pickerErr.name === "AbortError") return;
+          console.log("Direct picker notice, falling back smoothly to folder input:", pickerErr);
         }
-      } else {
-        if (this.cameraInput) {
-          this.cameraInput.click();
-        } else if (this.folderInput) {
-          this.folderInput.click();
+
+        if (dirHandle) {
+          const files = [];
+          const scanDir = async (handle) => {
+            for await (const entry of handle.values()) {
+              if (entry.kind === "file") {
+                const file = await entry.getFile();
+                if (file.type.startsWith("image/") || /\.(arw|cr2|cr3|nef|dng|heic|tif|tiff|jpg|jpeg|png|webp)$/i.test(file.name)) {
+                  file.deviceSource = type;
+                  file.isFromConnectedDevice = true;
+                  file.deviceModel = deviceName;
+                  files.push(file);
+                }
+              } else if (entry.kind === "directory") {
+                await scanDir(entry);
+              }
+            }
+          };
+
+          await scanDir(dirHandle);
+
+          if (files.length > 0) {
+            this.applyConnectedDeviceFiles(deviceName, type, files);
+            return;
+          }
         }
       }
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Device connection error:", err);
-        this.showToast(`Could not read device: ${err.message}`, "error");
-      }
+      if (err.name === "AbortError") return;
+      console.warn("Storage notice:", err);
     }
+
+    // Smooth zero-warning fallback for phones (MTP/Vivo) and memory cards
+    if (this.deviceFolderInput) {
+      this.deviceFolderInput.click();
+    } else if (this.deviceFilesInput) {
+      this.deviceFilesInput.click();
+    }
+  }
+
+  applyConnectedDeviceFiles(deviceName, type, files) {
+    this.activeConnectedDevice = { type, name: deviceName, count: files.length };
+    
+    // Unhide and configure dedicated device tab
+    if (this.tabs.device) {
+      this.tabs.device.classList.remove("hidden");
+    }
+    if (this.tabDeviceLabel) {
+      this.tabDeviceLabel.innerText = deviceName;
+    }
+    if (this.badgeDevice) {
+      this.badgeDevice.innerText = files.length;
+    }
+    if (this.connectedDeviceBanner) {
+      this.connectedDeviceTitle.innerText = `Connected: ${deviceName}`;
+      this.connectedDeviceStats.innerText = `Imported ${files.length} captures exclusively from this device`;
+      this.connectedDeviceBanner.classList.remove("hidden");
+    }
+
+    this.showToast(`Connected ${deviceName}! Loaded ${files.length} captures.`, "success");
+    this.handleFiles(files);
+    
+    // Switch to dedicated device tab so user sees all files and folders
+    setTimeout(() => {
+      this.switchTab("device");
+    }, 400);
   }
 
   async handleFiles(fileList) {
@@ -547,7 +620,13 @@ class PhotoCullerApp {
   }
 
   getFilteredPhotos() {
-    let filtered = this.photos.filter((p) => p.category === this.activeTab);
+    let filtered;
+    if (this.activeTab === "device") {
+      filtered = this.photos.filter((p) => p.isFromConnectedDevice || p.deviceSource);
+      if (filtered.length === 0) filtered = this.photos;
+    } else {
+      filtered = this.photos.filter((p) => p.category === this.activeTab);
+    }
 
     // VIP Person Finder Filter
     if (this.filterMatchedPersonOnly) {
@@ -822,6 +901,14 @@ class PhotoCullerApp {
     this.badgeBad.innerText = bad;
     this.badgeDuplicates.innerText = duplicates;
     this.badgeTrash.innerText = trash;
+
+    if (this.badgeDevice) {
+      const devCount = this.photos.filter((p) => p.isFromConnectedDevice || p.deviceSource).length;
+      this.badgeDevice.innerText = devCount;
+      if (devCount > 0 && this.tabs.device) {
+        this.tabs.device.classList.remove("hidden");
+      }
+    }
 
     // Enable/disable ZIP button
     this.btnDownloadZip.disabled = good === 0;
